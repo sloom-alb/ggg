@@ -194,4 +194,15 @@
       });
 
       category1Select.addEventListener('change', () => filterData());
-      category2Select.addEventListener('change', () => filterData());
+      category2Select.addEventListener('change', () => filterData());
+    }
+
+    function filterData() {
+      const selectedCategory1 = document.getElementById('category1-select').value;
+      const selectedCategory2 = document.getElementById('category2-select').value;
+
+      const filteredData = allData.filter(item => {
+        const matchesCategory1 = selectedCategory1 ? item['column1'] === selectedCategory1 : true;
+        const matchesCategory2 = selectedCategory2 ? item['column2'] === selectedCategory2 : true;
+        return matchesCategory1 && matchesCategory2;
+      });
