@@ -3,29 +3,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SLOOM</title>
+  <title>درجات طلاب نخب</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .filters {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .filters select {
+      margin: 0 10px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
     table {
       width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
       border-collapse: collapse;
-      margin: 20px 0;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     table, th, td {
-      border: 1px solid black;
+      border: 1px solid #ddd;
     }
     th, td {
-      padding: 10px;
-      text-align: left;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+      color: #333;
+    }
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    tbody tr:hover {
+      background-color: #f1f1f1;
     }
   </style>
 </head>
 <body>
 
-  <h1>عرض بيانات Google Sheets</h1>
+  <h1>درجات طلاب نخب</h1>
+
+  <!-- القوائم المنسدلة للتصفية -->
+  <div class="filters">
+    <select id="row-dropdown">
+      <option value="">اختر من الصف الأول</option>
+    </select>
+    <select id="column-dropdown">
+      <option value="">اختر من العمود الثاني</option>
+    </select>
+  </div>
+
   <table id="data-table">
     <thead>
       <tr>
-        <!-- رؤوس الأعمدة العشرون -->
         <th>العمود 1</th>
         <th>العمود 2</th>
         <th>العمود 3</th>
@@ -61,7 +104,11 @@
         const data = await response.json();
         
         const tableBody = document.getElementById('data');
+        const rowDropdown = document.getElementById('row-dropdown');
+        const columnDropdown = document.getElementById('column-dropdown');
+        
         if (Array.isArray(data)) {
+          // تعبئة الجدول
           data.forEach(item => {
             const row = document.createElement('tr');
             for (let i = 1; i <= 20; i++) {
@@ -71,6 +118,14 @@
             }
             tableBody.appendChild(row);
           });
+
+          // تعبئة القوائم المنسدلة
+          populateDropdown(rowDropdown, data.map(item => item['column1']).filter(unique));
+          populateDropdown(columnDropdown, data.map(item => item['column2']).filter(unique));
+
+          // تصفية البيانات عند تغيير القيم في القوائم المنسدلة
+          rowDropdown.addEventListener('change', () => filterTable(data));
+          columnDropdown.addEventListener('change', () => filterTable(data));
         } else {
           console.error('البيانات ليست مصفوفة.');
           tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
@@ -79,6 +134,44 @@
         console.error('حدث خطأ أثناء جلب البيانات:', error);
         document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
       }
+    }
+
+    // ملء القائمة المنسدلة بالقيم الفريدة
+    function populateDropdown(dropdown, items) {
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.textContent = item;
+        option.value = item;
+        dropdown.appendChild(option);
+      });
+    }
+
+    // تصفية الجدول بناءً على القيمة المحددة في القوائم المنسدلة
+    function filterTable(data) {
+      const rowValue = document.getElementById('row-dropdown').value;
+      const columnValue = document.getElementById('column-dropdown').value;
+      const tableBody = document.getElementById('data');
+      tableBody.innerHTML = '';
+
+      data.forEach(item => {
+        if (
+          (rowValue === '' || item['column1'] === rowValue) &&
+          (columnValue === '' || item['column2'] === columnValue)
+        ) {
+          const row = document.createElement('tr');
+          for (let i = 1; i <= 20; i++) {
+            const cell = document.createElement('td');
+            cell.textContent = item['column' + i] || '';
+            row.appendChild(cell);
+          }
+          tableBody.appendChild(row);
+        }
+      });
+    }
+
+    // دالة لإرجاع القيم الفريدة في المصفوفة
+    function unique(value, index, self) {
+      return self.indexOf(value) === index;
     }
 
     fetchData();
