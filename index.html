@@ -22,4 +22,176 @@
     /* تصميم الجدول */
     table {
       width: 100%;
-      border-collapse: collapse
+      border-collapse: collapse;
+      margin: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* إضافة ظل للجدول */
+      border-radius: 8px; /* جعل الزوايا دائرية */
+      overflow: hidden; /* لإخفاء الأجزاء الزائدة */
+    }
+
+    /* جعل الصف الثابت */
+    thead {
+      position: sticky; /* يجعل الصف ثابت */
+      top: 0; /* يحدد موقع الصف الثابت */
+      background-color: #ffffff; /* لون خلفية الصف الثابت */
+      z-index: 10; /* يجعل الصف فوق الصفوف الأخرى */
+    }
+
+    /* تصميم الحدود للجدول والخلايا */
+    table, th, td {
+      border: 1px solid #dddddd; /* تغيير لون الحدود */
+    }
+
+    th, td {
+      padding: 12px; /* زيادة الهوامش داخل الخلايا */
+      text-align: left;
+      font-size: 16px; /* زيادة حجم الخط في الخلايا */
+    }
+
+    /* تصميم تمييز الصفوف بلون فاتح وغامق بالتناوب */
+    tr:nth-child(even) {
+      background-color: #f9f9f9; /* لون فاتح */
+    }
+
+    tr:nth-child(odd) {
+      background-color: #ffffff; /* لون غامق */
+    }
+
+    /* تصميم القوائم المنسدلة */
+    .dropdown {
+      margin: 10px 0; /* إضافة هوامش */
+      padding: 10px; /* زيادة الهوامش داخل القوائم */
+      font-size: 16px; /* حجم الخط */
+      border: 1px solid #cccccc; /* لون الحدود */
+      border-radius: 4px; /* جعل الزوايا دائرية */
+      background-color: #ffffff; /* لون خلفية القوائم المنسدلة */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* إضافة ظل للقوائم */
+      width: calc(100% - 20px); /* جعل عرض القوائم 100% مع هوامش */
+      display: block; /* عرض القوائم بشكل عمودي */
+    }
+
+    /* تحسين تصميم الزر */
+    button {
+      background-color: #003366; /* لون الزر */
+      color: white; /* لون النص */
+      border: none; /* إزالة الحدود */
+      padding: 10px 15px; /* هوامش الزر */
+      border-radius: 5px; /* جعل الزوايا دائرية */
+      cursor: pointer; /* تغيير شكل المؤشر عند المرور فوق الزر */
+      font-size: 16px; /* حجم الخط */
+      margin-top: 10px; /* إضافة هوامش فوق الزر */
+      width: 100%; /* جعل الزر بعرض 100% */
+    }
+
+    button:hover {
+      background-color: #005699; /* تغيير لون الزر عند المرور فوقه */
+    }
+
+    /* تحسين استجابة الجدول للأجهزة المحمولة */
+    @media screen and (max-width: 600px) {
+      h1 {
+        font-size: 20px; /* تقليل حجم الخط على الجوال */
+      }
+
+      table {
+        font-size: 14px; /* تقليل حجم الخط داخل الجدول */
+      }
+
+      th, td {
+        padding: 8px; /* تقليل هوامش الخلايا */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>درجات طلاب نخب</h1>
+  
+  <!-- القائمة المنسدلة الأولى -->
+  <label for="category1-select">اختر الفئة من العمود 1:</label>
+  <select id="category1-select" class="dropdown">
+    <option value="">جميع الفئات</option>
+  </select>
+
+  <!-- القائمة المنسدلة الثانية -->
+  <label for="category2-select">اختر الفئة من العمود 2:</label>
+  <select id="category2-select" class="dropdown">
+    <option value="">جميع الفئات</option>
+  </select>
+
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>العمود 1</th>
+        <th>العمود 2</th>
+        <th>العمود 3</th>
+        <th>العمود 4</th>
+        <th>العمود 5</th>
+        <th>العمود 6</th>
+        <th>العمود 7</th>
+        <th>العمود 8</th>
+        <th>العمود 9</th>
+        <th>العمود 10</th>
+        <th>العمود 11</th>
+        <th>العمود 12</th>
+        <th>العمود 13</th>
+        <th>العمود 14</th>
+        <th>العمود 15</th>
+        <th>العمود 16</th>
+        <th>العمود 17</th>
+        <th>العمود 18</th>
+        <th>العمود 19</th>
+        <th>العمود 20</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+
+  <script>
+    let allData = []; // لتخزين البيانات الكاملة
+
+    async function fetchData() {
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbw26BtKWUD6ZUV8DtGNQcvUo_oJoocBgevRqpXRV5boqaqJNtrLp8mWukOJK6xWtIY96A/exec');
+        if (!response.ok) {
+          throw new Error('شبكة الخطأ: ' + response.statusText);
+        }
+        const data = await response.json();
+
+        const tableBody = document.getElementById('data');
+        if (Array.isArray(data)) {
+          allData = data; // تخزين البيانات الكاملة
+          populateDropdowns(allData); // ملء القوائم المنسدلة
+          displayData(allData); // عرض البيانات الكاملة
+        } else {
+          console.error('البيانات ليست مصفوفة.');
+          tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
+        }
+      } catch (error) {
+        console.error('حدث خطأ أثناء جلب البيانات:', error);
+        document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
+      }
+    }
+
+    function populateDropdowns(data) {
+      const category1Select = document.getElementById('category1-select');
+      const category2Select = document.getElementById('category2-select');
+
+      const categories1 = new Set(data.map(item => item['column1'])); // الحصول على فئات العمود 1
+      categories1.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        category1Select.appendChild(option);
+      });
+
+      const categories2 = new Set(data.map(item => item['column2'])); // الحصول على فئات العمود 2
+      categories2.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        category2Select.appendChild(option);
+      });
+
+      category1Select.addEventListener('change', () => filterData());
+      category2Select.addEventListener('change', () => filterData());
