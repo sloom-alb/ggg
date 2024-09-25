@@ -5,17 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>عرض بيانات Google Sheets</title>
   <style>
+    /* إخفاء رؤوس الأعمدة */
+    th {
+      display: none;
+    }
+
+    /* تغيير لون الصف الأول (رؤوس الأعمدة) إذا كنت تريد عرضها */
+    /* يمكنك إلغاء التعليق إذا أردت استرجاع الرؤوس بلون مختلف */
+    /* th {
+      background-color: #4CAF50; 
+      color: white; 
+    } */
+
+    /* تغيير لون خط العنوان */
+    h1 {
+      color: #4CAF50; /* لون النص */
+      font-family: Arial, sans-serif;
+    }
+
+    /* تصميم الجدول */
     table {
       width: 100%;
       border-collapse: collapse;
       margin: 20px 0;
     }
+    
     table, th, td {
       border: 1px solid black;
     }
+
     th, td {
       padding: 10px;
       text-align: left;
+    }
+
+    /* تمييز الصفوف بلون فاتح وغامق بالتناوب */
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #ffffff;
     }
   </style>
 </head>
@@ -25,7 +55,7 @@
   <table id="data-table">
     <thead>
       <tr>
-        <!-- رؤوس الأعمدة العشرون -->
+        <!-- إخفاء رؤوس الأعمدة -->
         <th>العمود 1</th>
         <th>العمود 2</th>
         <th>العمود 3</th>
