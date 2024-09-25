@@ -67,28 +67,9 @@
   </div>
 
   <table id="data-table">
-    <thead>
+    <thead id="table-head">
       <tr>
-        <th>العمود 1</th>
-        <th>العمود 2</th>
-        <th>العمود 3</th>
-        <th>العمود 4</th>
-        <th>العمود 5</th>
-        <th>العمود 6</th>
-        <th>العمود 7</th>
-        <th>العمود 8</th>
-        <th>العمود 9</th>
-        <th>العمود 10</th>
-        <th>العمود 11</th>
-        <th>العمود 12</th>
-        <th>العمود 13</th>
-        <th>العمود 14</th>
-        <th>العمود 15</th>
-        <th>العمود 16</th>
-        <th>العمود 17</th>
-        <th>العمود 18</th>
-        <th>العمود 19</th>
-        <th>العمود 20</th>
+        <!-- سيتم ملء عناوين الأعمدة من الصف الثاني -->
       </tr>
     </thead>
     <tbody id="data"></tbody>
@@ -103,23 +84,33 @@
         }
         const data = await response.json();
         
+        const tableHead = document.getElementById('table-head');
         const tableBody = document.getElementById('data');
         const rowDropdown = document.getElementById('row-dropdown');
         const columnDropdown = document.getElementById('column-dropdown');
         
-        if (Array.isArray(data)) {
-          // تعبئة الجدول
-          data.forEach(item => {
+        if (Array.isArray(data) && data.length > 1) {
+          // تعيين الصف الثاني كعناوين للأعمدة
+          const headerRow = document.createElement('tr');
+          Object.keys(data[1]).forEach(key => {
+            const th = document.createElement('th');
+            th.textContent = data[1][key] || '';
+            headerRow.appendChild(th);
+          });
+          tableHead.appendChild(headerRow);
+
+          // تعبئة الجدول ببقية الصفوف بدءًا من الصف الثالث
+          data.slice(2).forEach(item => {
             const row = document.createElement('tr');
-            for (let i = 1; i <= 20; i++) {
+            Object.keys(item).forEach(key => {
               const cell = document.createElement('td');
-              cell.textContent = item['column' + i] || '';
+              cell.textContent = item[key] || '';
               row.appendChild(cell);
-            }
+            });
             tableBody.appendChild(row);
           });
 
-          // تعبئة القوائم المنسدلة
+          // تعبئة القوائم المنسدلة بالقيم الفريدة من الصف الأول والعمود الثاني
           populateDropdown(rowDropdown, data.map(item => item['column1']).filter(unique));
           populateDropdown(columnDropdown, data.map(item => item['column2']).filter(unique));
 
@@ -127,7 +118,7 @@
           rowDropdown.addEventListener('change', () => filterTable(data));
           columnDropdown.addEventListener('change', () => filterTable(data));
         } else {
-          console.error('البيانات ليست مصفوفة.');
+          console.error('البيانات غير كافية.');
           tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
         }
       } catch (error) {
@@ -153,17 +144,17 @@
       const tableBody = document.getElementById('data');
       tableBody.innerHTML = '';
 
-      data.forEach(item => {
+      data.slice(2).forEach(item => {
         if (
           (rowValue === '' || item['column1'] === rowValue) &&
           (columnValue === '' || item['column2'] === columnValue)
         ) {
           const row = document.createElement('tr');
-          for (let i = 1; i <= 20; i++) {
+          Object.keys(item).forEach(key => {
             const cell = document.createElement('td');
-            cell.textContent = item['column' + i] || '';
+            cell.textContent = item[key] || '';
             row.appendChild(cell);
-          }
+          });
           tableBody.appendChild(row);
         }
       });
