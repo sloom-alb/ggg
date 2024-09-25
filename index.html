@@ -49,12 +49,20 @@
     tr:nth-child(odd) {
       background-color: #ffffff;
     }
+
+    /* تصميم القائمة المنسدلة */
+    #category-select {
+      margin: 20px 0;
+      padding: 10px;
+      font-size: 16px;
+    }
   </style>
 </head>
 <body>
 
   <h1>عرض بيانات Google Sheets</h1>
   
+  <!-- القائمة المنسدلة -->
   <label for="category-select">اختر الفئة:</label>
   <select id="category-select">
     <option value="">جميع الفئات</option>
@@ -63,7 +71,6 @@
   <table id="data-table">
     <thead>
       <tr>
-        <!-- إخفاء رؤوس الأعمدة -->
         <th>العمود 1</th>
         <th>العمود 2</th>
         <th>العمود 3</th>
@@ -77,7 +84,9 @@
         <th>العمود 11</th>
         <th>العمود 12</th>
         <th>العمود 13</th>
-        <th>العمود 14</th>
+        <th>
+          العمود 14
+        </th>
         <th>العمود 15</th>
         <th>العمود 16</th>
         <th>العمود 17</th>
