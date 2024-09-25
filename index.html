@@ -12,8 +12,11 @@
 
     /* تغيير لون خط العنوان */
     h1 {
-      color: #4CAF50; /* لون النص */
+      color: #003366; /* الأزرق الغامق */
       font-family: Arial, sans-serif;
+      text-align: center; /* توسيط العنوان */
+      margin: 20px 0; /* إضافة هوامش للعنوان */
+      font-size: 24px; /* زيادة حجم الخط */
     }
 
     /* تصميم الجدول */
@@ -22,49 +25,83 @@
       border-collapse: collapse;
       margin: 20px 0;
       position: relative; /* لجعل الصف ثابت */
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* إضافة ظل للجدول */
+      border-radius: 8px; /* جعل الزوايا دائرية */
+      overflow: hidden; /* لإخفاء الأجزاء الزائدة */
     }
 
     /* جعل الصف الثابت */
     thead {
       position: sticky; /* يجعل الصف ثابت */
       top: 0; /* يحدد موقع الصف الثابت */
-      background-color: white; /* لون خلفية الصف الثابت */
+      background-color: #ffffff; /* لون خلفية الصف الثابت */
       z-index: 10; /* يجعل الصف فوق الصفوف الأخرى */
     }
-    
+
+    /* تصميم الحدود للجدول والخلايا */
     table, th, td {
-      border: 1px solid black;
+      border: 1px solid #dddddd; /* تغيير لون الحدود */
     }
 
     th, td {
-      padding: 10px;
+      padding: 12px; /* زيادة الهوامش داخل الخلايا */
       text-align: left;
+      font-size: 16px; /* زيادة حجم الخط في الخلايا */
     }
 
-    /* تمييز الصفوف بلون فاتح وغامق بالتناوب */
+    /* تصميم تمييز الصفوف بلون فاتح وغامق بالتناوب */
     tr:nth-child(even) {
-      background-color: #f2f2f2;
+      background-color: #f9f9f9; /* لون فاتح */
     }
 
     tr:nth-child(odd) {
-      background-color: #ffffff;
+      background-color: #ffffff; /* لون غامق */
     }
 
-    /* تصميم القائمة المنسدلة */
-    #category-select {
-      margin: 20px 0;
-      padding: 10px;
-      font-size: 16px;
+    /* تصميم القوائم المنسدلة */
+    .dropdown {
+      margin: 10px 0; /* إضافة هوامش */
+      padding: 10px; /* زيادة الهوامش داخل القوائم */
+      font-size: 16px; /* حجم الخط */
+      border: 1px solid #cccccc; /* لون الحدود */
+      border-radius: 4px; /* جعل الزوايا دائرية */
+      background-color: #ffffff; /* لون خلفية القوائم المنسدلة */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* إضافة ظل للقوائم */
+      width: calc(50% - 20px); /* جعل عرض القوائم نصف العرض مع هوامش */
+      display: inline-block; /* عرض القوائم بشكل جانبي */
     }
+
+    /* تحسين تصميم الزر */
+    button {
+      background-color: #003366; /* لون الزر */
+      color: white; /* لون النص */
+      border: none; /* إزالة الحدود */
+      padding: 10px 15px; /* هوامش الزر */
+      border-radius: 5px; /* جعل الزوايا دائرية */
+      cursor: pointer; /* تغيير شكل المؤشر عند المرور فوق الزر */
+      font-size: 16px; /* حجم الخط */
+      margin-top: 10px; /* إضافة هوامش فوق الزر */
+    }
+
+    button:hover {
+      background-color: #005699; /* تغيير لون الزر عند المرور فوقه */
+    }
+
   </style>
 </head>
 <body>
 
-  <h1>عرض بيانات Google Sheets</h1>
+  <h1>درجات طلاب نخب</h1>
   
-  <!-- القائمة المنسدلة -->
-  <label for="category-select">اختر الفئة:</label>
-  <select id="category-select">
+  <!-- القائمة المنسدلة الأولى -->
+  <label for="category1-select">اختر الفئة من العمود 1:</label>
+  <select id="category1-select" class="dropdown">
+    <option value="">جميع الفئات</option>
+  </select>
+
+  <!-- القائمة المنسدلة الثانية -->
+  <label for="category2-select">اختر الفئة من العمود 2:</label>
+  <select id="category2-select" class="dropdown">
     <option value="">جميع الفئات</option>
   </select>
 
@@ -84,9 +121,7 @@
         <th>العمود 11</th>
         <th>العمود 12</th>
         <th>العمود 13</th>
-        <th>
-          العمود 14
-        </th>
+        <th>العمود 14</th>
         <th>العمود 15</th>
         <th>العمود 16</th>
         <th>العمود 17</th>
@@ -112,7 +147,7 @@
         const tableBody = document.getElementById('data');
         if (Array.isArray(data)) {
           allData = data; // تخزين البيانات الكاملة
-          populateDropdown(allData); // ملء القائمة المنسدلة
+          populateDropdowns(allData); // ملء القوائم المنسدلة
           displayData(allData); // عرض البيانات الكاملة
         } else {
           console.error('البيانات ليست مصفوفة.');
@@ -124,21 +159,41 @@
       }
     }
 
-    function populateDropdown(data) {
-      const categorySelect = document.getElementById('category-select');
-      const categories = new Set(data.map(item => item['column1'])); // تغيير "column1" إلى اسم العمود المناسب للفئات
-      categories.forEach(category => {
+    function populateDropdowns(data) {
+      const category1Select = document.getElementById('category1-select');
+      const category2Select = document.getElementById('category2-select');
+
+      const categories1 = new Set(data.map(item => item['column1'])); // الحصول على فئات العمود 1
+      categories1.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
         option.textContent = category;
-        categorySelect.appendChild(option);
+        category1Select.appendChild(option);
       });
 
-      categorySelect.addEventListener('change', (event) => {
-        const selectedCategory = event.target.value;
-        const filteredData = selectedCategory ? data.filter(item => item['column1'] === selectedCategory) : data;
-        displayData(filteredData);
+      const categories2 = new Set(data.map(item => item['column2'])); // الحصول على فئات العمود 2
+      categories2.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category;
+        option.textContent = category;
+        category2Select.appendChild(option);
       });
+
+      category1Select.addEventListener('change', () => filterData());
+      category2Select.addEventListener('change', () => filterData());
+    }
+
+    function filterData() {
+      const selectedCategory1 = document.getElementById('category1-select').value;
+      const selectedCategory2 = document.getElementById('category2-select').value;
+
+      const filteredData = allData.filter(item => {
+        const matchesCategory1 = selectedCategory1 ? item['column1'] === selectedCategory1 : true;
+        const matchesCategory2 = selectedCategory2 ? item['column2'] === selectedCategory2 : true;
+        return matchesCategory1 && matchesCategory2;
+      });
+
+      displayData(filteredData);
     }
 
     function displayData(data) {
