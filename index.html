@@ -69,7 +69,7 @@
   <table id="data-table">
     <thead id="table-head">
       <tr>
-        <!-- سيتم ملئ الأعمدة من الصف الأول -->
+        <!-- سيتم ملئ الأعمدة من الصف الثاني -->
       </tr>
     </thead>
     <tbody id="data"></tbody>
@@ -90,7 +90,7 @@
         const columnDropdown = document.getElementById('column-dropdown');
         
         if (Array.isArray(data) && data.length > 1) {
-          // تعيين الصف الأول كعناوين للأعمدة
+          // تعيين الصف الثاني كعناوين للأعمدة
           const headerRow = document.createElement('tr');
           Object.keys(data[1]).forEach(key => {
             const th = document.createElement('th');
@@ -129,6 +129,8 @@
 
     // ملء القائمة المنسدلة بالقيم الفريدة
     function populateDropdown(dropdown, items) {
+      // التأكد من عدم وجود قيم فارغة أو غير صحيحة
+      items = items.filter(item => item && item.trim() !== "");
       items.forEach(item => {
         const option = document.createElement('option');
         option.textContent = item;
