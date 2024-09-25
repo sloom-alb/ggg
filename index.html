@@ -90,7 +90,7 @@
         const columnDropdown = document.getElementById('column-dropdown');
         
         if (Array.isArray(data) && data.length > 1) {
-          // تعيين الصف الثاني كعناوين للأعمدة
+          // تعيين الصف الأول كعناوين للأعمدة
           const headerRow = document.createElement('tr');
           Object.keys(data[1]).forEach(key => {
             const th = document.createElement('th');
