@@ -89,7 +89,7 @@
         const rowDropdown = document.getElementById('row-dropdown');
         const columnDropdown = document.getElementById('column-dropdown');
         
-        if (Array.isArray(data) && data.length > 1) {
+        if (Array.isArray(data) && data.length > 0) {
           // تعيين الصف الأول كعناوين للأعمدة
           const headerRow = document.createElement('tr');
           Object.keys(data[0]).forEach(key => {
@@ -129,6 +129,7 @@
 
     // ملء القائمة المنسدلة بالقيم الفريدة
     function populateDropdown(dropdown, items) {
+      // إزالة القيم الفارغة
       items = items.filter(item => item && item.trim() !== "");
       items.forEach(item => {
         const option = document.createElement('option');
@@ -145,7 +146,7 @@
       const tableBody = document.getElementById('data');
       tableBody.innerHTML = '';
 
-      data.slice(1).forEach(item => {
+      data.slice(1).forEach(item => { // بدءًا من الصف الثاني
         if (
           (rowValue === '' || item['column1'] === rowValue) &&
           (columnValue === '' || item['column2'] === columnValue)
