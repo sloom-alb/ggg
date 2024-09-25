@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>عرض بيانات Google Sheets</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>عرض بيانات Google Sheets</h1>
+  <table id="data-table">
+    <thead>
+      <tr>
+        <!-- رؤوس الأعمدة العشرون -->
+        <th>العمود 1</th>
+        <th>العمود 2</th>
+        <th>العمود 3</th>
+        <th>العمود 4</th>
+        <th>العمود 5</th>
+        <th>العمود 6</th>
+        <th>العمود 7</th>
+        <th>العمود 8</th>
+        <th>العمود 9</th>
+        <th>العمود 10</th>
+        <th>العمود 11</th>
+        <th>العمود 12</th>
+        <th>العمود 13</th>
+        <th>العمود 14</th>
+        <th>العمود 15</th>
+        <th>العمود 16</th>
+        <th>العمود 17</th>
+        <th>العمود 18</th>
+        <th>العمود 19</th>
+        <th>العمود 20</th>
+      </tr>
+    </thead>
+    <tbody id="data"></tbody>
+  </table>
+
+  <script>
+    async function fetchData() {
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbw26BtKWUD6ZUV8DtGNQcvUo_oJoocBgevRqpXRV5boqaqJNtrLp8mWukOJK6xWtIY96A/exec');
+        if (!response.ok) {
+          throw new Error('شبكة الخطأ: ' + response.statusText);
+        }
+        const data = await response.json();
+        
+        const tableBody = document.getElementById('data');
+        if (Array.isArray(data)) {
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            for (let i = 1; i <= 20; i++) {
+              const cell = document.createElement('td');
+              cell.textContent = item['column' + i] || '';
+              row.appendChild(cell);
+            }
+            tableBody.appendChild(row);
+          });
+        } else {
+          console.error('البيانات ليست مصفوفة.');
+          tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
+        }
+      } catch (error) {
+        console.error('حدث خطأ أثناء جلب البيانات:', error);
+        document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
+      }
+    }
+
+    fetchData();
+  </script>
+
+</body>
+</html>
