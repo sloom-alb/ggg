@@ -67,8 +67,8 @@
       border-radius: 4px; /* جعل الزوايا دائرية */
       background-color: #ffffff; /* لون خلفية القوائم المنسدلة */
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* إضافة ظل للقوائم */
-      width: calc(50% - 20px); /* جعل عرض القوائم نصف العرض مع هوامش */
-      display: inline-block; /* عرض القوائم بشكل جانبي */
+      width: calc(100% - 20px); /* جعل عرض القوائم 100% مع هوامش */
+      display: block; /* عرض القوائم بشكل عمودي */
     }
 
     /* تحسين تصميم الزر */
@@ -81,12 +81,27 @@
       cursor: pointer; /* تغيير شكل المؤشر عند المرور فوق الزر */
       font-size: 16px; /* حجم الخط */
       margin-top: 10px; /* إضافة هوامش فوق الزر */
+      width: 100%; /* جعل الزر بعرض 100% */
     }
 
     button:hover {
       background-color: #005699; /* تغيير لون الزر عند المرور فوقه */
     }
 
+    /* تحسين استجابة الجدول للأجهزة المحمولة */
+    @media screen and (max-width: 600px) {
+      h1 {
+        font-size: 20px; /* تقليل حجم الخط على الجوال */
+      }
+
+      table {
+        font-size: 14px; /* تقليل حجم الخط داخل الجدول */
+      }
+
+      th, td {
+        padding: 8px; /* تقليل هوامش الخلايا */
+      }
+    }
   </style>
 </head>
 <body>
@@ -200,18 +215,4 @@
       const tableBody = document.getElementById('data');
       tableBody.innerHTML = ''; // مسح البيانات الحالية
       data.forEach(item => {
-        const row = document.createElement('tr');
-        for (let i = 1; i <= 20; i++) {
-          const cell = document.createElement('td');
-          cell.textContent = item['column' + i] || '';
-          row.appendChild(cell);
-        }
-        tableBody.appendChild(row);
-      });
-    }
-
-    fetchData();
-  </script>
-
-</body>
-</html>
+        const row = document.createElement('tr
