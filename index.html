@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إرسال بيانات الطلاب</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+    .form-container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-container input, .form-container button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .form-container button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1em;
+    }
+    #message {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 1.2em;
+      color: green;
+    }
+  </style>
+</head>
+<body>
 
+  <h1>إرسال بيانات الطلاب</h1>
+  <div class="form-container">
+    <form id="student-form">
+      <label for="name">اسم الطالب:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="grade">الدرجة:</label>
+      <input type="number" id="grade" name="grade" required>
+
+      <label for="subject">المادة:</label>
+      <input type="text" id="subject" name="subject" required>
+
+      <button type="submit">إرسال البيانات</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // استبدال الرابط بالرابط الذي زودتني به
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzVqdRvX9NXjYRWQvhampot9JIDZ-rpSWPyDCM5wlLVFo-cuTFnLGfUUIzr8eEEBVYfcA/exec';
+    const form = document.getElementById('student-form');
+    const messageDiv = document.getElementById('message');
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      // جلب البيانات من النموذج
+      const formData = new FormData(form);
+      const data = {
+        name: formData.get('name'),
+        grade: formData.get('grade'),
+        subject: formData.get('subject')
+      };
+
+      // إرسال البيانات إلى Google Apps Script
+      try {
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+          messageDiv.textContent = 'تم إرسال البيانات بنجاح!';
+          messageDiv.style.color = 'green';
+          form.reset(); // إعادة تعيين النموذج بعد الإرسال
+        } else {
+          messageDiv.textContent = 'حدث خطأ أثناء إرسال البيانات.';
+          messageDiv.style.color = 'red';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        messageDiv.textContent = 'حدث خطأ في الاتصال بالخادم.';
+        messageDiv.style.color = 'red';
+      }
+    });
+  </script>
+
+</body>
+</html>
