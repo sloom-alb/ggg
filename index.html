@@ -73,11 +73,6 @@
     const form = document.getElementById('student-form');
     const messageDiv = document.getElementById('message');
 
-    // دالة للتحقق من صحة البيانات
-    function validateData(data) {
-      return data.اسم.trim() !== '' && data.الدرجة.trim() !== '' && data.المادة.trim() !== '';
-    }
-
     // حدث إرسال النموذج
     form.addEventListener('submit', async function(event) {
       event.preventDefault(); // منع إعادة تحميل الصفحة
@@ -85,13 +80,13 @@
       // جمع البيانات من النموذج
       const formData = new FormData(form);
       const data = {
-        "اسم": formData.get('name'),
-        "الدرجة": formData.get('grade'),
-        "المادة": formData.get('subject')
+        "اسم": formData.get('name').trim(),   // إزالة المسافات الزائدة
+        "الدرجة": formData.get('grade').trim(),
+        "المادة": formData.get('subject').trim()
       };
 
-      // تحقق من صحة البيانات
-      if (!validateData(data)) {
+      // التحقق من صحة البيانات قبل الإرسال
+      if (!data.اسم || !data.الدرجة || !data.المادة) {
         messageDiv.textContent = 'يرجى ملء جميع الحقول.';
         messageDiv.style.color = 'red';
         return;
