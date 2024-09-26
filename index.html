@@ -13,29 +13,30 @@
     h1 {
       text-align: center;
       color: #333;
-      font-size: 1.5em; /* تعديل حجم الخط */
+      font-size: 1.5em;
     }
     .filters {
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
-      flex-wrap: wrap; /* تمكين التفاف العناصر */
+      flex-wrap: wrap;
     }
     .filters select {
-      margin: 10px 5px; /* تعديل الهوامش لتقليل المسافات */
+      margin: 10px 5px;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
-      width: 100%; /* جعل القوائم المنسدلة بعرض كامل */
-      max-width: 300px; /* تحديد عرض أقصى للقوائم المنسدلة */
+      width: 100%;
+      max-width: 300px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      overflow-x: auto; /* تمكين التمرير الأفقي عند الحاجة */
-      display: block; /* جعل الجدول كتلة لتمكين التمرير */
+      overflow-x: auto;
+      display: block;
+      white-space: nowrap;
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -43,7 +44,7 @@
     th, td {
       padding: 12px;
       text-align: center;
-      font-size: 0.9em; /* تعديل حجم النص */
+      font-size: 0.9em;
     }
     th {
       background-color: #f2f2f2;
@@ -55,34 +56,41 @@
     tbody tr:hover {
       background-color: #f1f1f1;
     }
-
-    /* تحسينات لواجهة الموبايل */
     @media (max-width: 768px) {
       .filters {
-        flex-direction: column; /* جعل القوائم المنسدلة فوق بعضها */
-        align-items: center; /* محاذاة العناصر في المنتصف */
+        flex-direction: column;
+        align-items: center;
       }
       table, th, td {
-        font-size: 0.8em; /* تصغير حجم الخط قليلاً على الشاشات الصغيرة */
+        font-size: 0.7em;
       }
       th, td {
-        padding: 8px; /* تقليل المسافة الداخلية للخلية */
+        padding: 6px;
       }
     }
-
     @media (max-width: 480px) {
       h1 {
-        font-size: 1.2em; /* تقليل حجم عنوان الصفحة */
+        font-size: 1.2em;
       }
       .filters select {
-        max-width: none; /* إلغاء الحد الأقصى لعرض القوائم المنسدلة */
+        width: 100%;
+        padding: 12px;
       }
+    }
+    #loader {
+      text-align: center;
+      display: none;
     }
   </style>
 </head>
 <body>
 
   <h1>درجات طلاب نخب</h1>
+
+  <!-- مؤشر التحميل -->
+  <div id="loader">
+    <p>جاري تحميل البيانات...</p>
+  </div>
 
   <!-- القوائم المنسدلة للتصفية -->
   <div class="filters">
@@ -96,15 +104,24 @@
 
   <table id="data-table">
     <thead id="table-head">
-      <tr>
-        <!-- سيتم ملئ الأعمدة من الصف الأول -->
-      </tr>
+      <tr></tr>
     </thead>
     <tbody id="data"></tbody>
   </table>
 
   <script>
     async function fetchData() {
+      const loader = document.getElementById('loader');
+      loader.style.display = 'block'; // عرض مؤشر التحميل
+
+      // التحقق من وجود البيانات في localStorage
+      const cachedData = localStorage.getItem('studentData');
+      if (cachedData) {
+        renderTable(JSON.parse(cachedData)); // عرض البيانات المحفوظة إذا كانت موجودة
+        loader.style.display = 'none'; // إخفاء مؤشر التحميل
+        return;
+      }
+
       try {
         const response = await fetch('https://script.google.com/macros/s/AKfycbw26BtKWUD6ZUV8DtGNQcvUo_oJoocBgevRqpXRV5boqaqJNtrLp8mWukOJK6xWtIY96A/exec');
         if (!response.ok) {
@@ -112,56 +129,71 @@
         }
         const data = await response.json();
         
-        const tableHead = document.getElementById('table-head');
-        const tableBody = document.getElementById('data');
-        const rowDropdown = document.getElementById('row-dropdown');
-        const columnDropdown = document.getElementById('column-dropdown');
-        
-        if (Array.isArray(data) && data.length > 0) {
-          // تعيين الصف الأول كعناوين للأعمدة
-          const headerRow = document.createElement('tr');
-          Object.keys(data[0]).forEach(key => {
-            const th = document.createElement('th');
-            th.textContent = key; // استخدام أسماء المفاتيح كعناوين
-            headerRow.appendChild(th);
-          });
-          tableHead.appendChild(headerRow);
-
-          // تعبئة الجدول ببقية الصفوف بدءًا من الصف الأول
-          data.forEach(item => {
-            const row = document.createElement('tr');
-            Object.values(item).forEach(value => {
-              const cell = document.createElement('td');
-              cell.textContent = value || '';
-              row.appendChild(cell);
-            });
-            tableBody.appendChild(row);
-          });
-
-          // تعبئة القوائم المنسدلة بالقيم الفريدة
-          const column1 = Object.keys(data[0])[0]; // أخذ اسم العمود الأول
-          const column2 = Object.keys(data[0])[1]; // أخذ اسم العمود الثاني
-
-          populateDropdown(rowDropdown, data.map(item => item[column1]).filter(unique));
-          populateDropdown(columnDropdown, data.map(item => item[column2]).filter(unique));
-
-          // تصفية البيانات عند تغيير القيم في القوائم المنسدلة
-          rowDropdown.addEventListener('change', () => filterTable(data));
-          columnDropdown.addEventListener('change', () => filterTable(data));
-        } else {
-          console.error('البيانات غير كافية.');
-          tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
-        }
+        // حفظ البيانات في localStorage
+        localStorage.setItem('studentData', JSON.stringify(data));
+        loader.style.display = 'none'; // إخفاء مؤشر التحميل
+        renderTable(data);
       } catch (error) {
+        loader.style.display = 'none'; // إخفاء مؤشر التحميل في حالة الخطأ
         console.error('حدث خطأ أثناء جلب البيانات:', error);
         document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
       }
     }
 
+    function renderTable(data) {
+      const tableHead = document.getElementById('table-head');
+      const tableBody = document.getElementById('data');
+      const rowDropdown = document.getElementById('row-dropdown');
+      const columnDropdown = document.getElementById('column-dropdown');
+
+      // تنظيف الجداول والقوائم المنسدلة
+      tableHead.innerHTML = '';
+      tableBody.innerHTML = '';
+      rowDropdown.innerHTML = '<option value="">اختر من الصف الأول</option>';
+      columnDropdown.innerHTML = '<option value="">اختر من العمود الثاني</option>';
+
+      if (Array.isArray(data) && data.length > 0) {
+        // تعيين الصف الأول كعناوين للأعمدة
+        const headerRow = document.createElement('tr');
+        Object.keys(data[0]).forEach(key => {
+          const th = document.createElement('th');
+          th.textContent = key; // استخدام أسماء المفاتيح كعناوين
+          headerRow.appendChild(th);
+        });
+        tableHead.appendChild(headerRow);
+
+        // استخدام documentFragment لتحسين الأداء عند إدراج الصفوف
+        const fragment = document.createDocumentFragment();
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          Object.values(item).forEach(value => {
+            const cell = document.createElement('td');
+            cell.textContent = value || '';
+            row.appendChild(cell);
+          });
+          fragment.appendChild(row);
+        });
+        tableBody.appendChild(fragment); // إضافة جميع الصفوف دفعة واحدة
+
+        // تعبئة القوائم المنسدلة بالقيم الفريدة
+        const column1 = Object.keys(data[0])[0]; // أخذ اسم العمود الأول
+        const column2 = Object.keys(data[0])[1]; // أخذ اسم العمود الثاني
+
+        populateDropdown(rowDropdown, data.map(item => item[column1]).filter(unique));
+        populateDropdown(columnDropdown, data.map(item => item[column2]).filter(unique));
+
+        // تصفية البيانات عند تغيير القيم في القوائم المنسدلة
+        rowDropdown.addEventListener('change', () => filterTable(data));
+        columnDropdown.addEventListener('change', () => filterTable(data));
+      } else {
+        console.error('البيانات غير كافية.');
+        tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
+      }
+    }
+
     // ملء القائمة المنسدلة بالقيم الفريدة
     function populateDropdown(dropdown, items) {
-      // إزالة القيم الفارغة
-      items = items.filter(item => item && item.trim() !== "");
+      items = items.filter(item => item && item.trim() !== ""); // إزالة القيم الفارغة
       items.forEach(item => {
         const option = document.createElement('option');
         option.textContent = item;
@@ -177,6 +209,7 @@
       const tableBody = document.getElementById('data');
       tableBody.innerHTML = '';
 
+      const fragment = document.createDocumentFragment();
       data.forEach(item => {
         if (
           (rowValue === '' || item[Object.keys(item)[0]] === rowValue) &&
@@ -188,9 +221,10 @@
             cell.textContent = value || '';
             row.appendChild(cell);
           });
-          tableBody.appendChild(row);
+          fragment.appendChild(row);
         }
       });
+      tableBody.appendChild(fragment); // إضافة جميع الصفوف التي تم تصفيتها دفعة واحدة
     }
 
     // دالة لإرجاع القيم الفريدة في المصفوفة
