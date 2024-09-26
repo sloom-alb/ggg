@@ -94,25 +94,28 @@
           const headerRow = document.createElement('tr');
           Object.keys(data[0]).forEach(key => {
             const th = document.createElement('th');
-            th.textContent = data[0][key] || ''; // استخدام الصف الأول كعناوين
+            th.textContent = key; // استخدام أسماء المفاتيح كعناوين
             headerRow.appendChild(th);
           });
           tableHead.appendChild(headerRow);
 
-          // تعبئة الجدول ببقية الصفوف بدءًا من الصف الثاني
-          data.slice(1).forEach(item => {
+          // تعبئة الجدول ببقية الصفوف بدءًا من الصف الأول
+          data.forEach(item => {
             const row = document.createElement('tr');
-            Object.keys(item).forEach(key => {
+            Object.values(item).forEach(value => {
               const cell = document.createElement('td');
-              cell.textContent = item[key] || '';
+              cell.textContent = value || '';
               row.appendChild(cell);
             });
             tableBody.appendChild(row);
           });
 
-          // تعبئة القوائم المنسدلة بالقيم الفريدة من الصف الأول والعمود الثاني
-          populateDropdown(rowDropdown, data.map(item => item['column1']).filter(unique));
-          populateDropdown(columnDropdown, data.map(item => item['column2']).filter(unique));
+          // تعبئة القوائم المنسدلة بالقيم الفريدة
+          const column1 = Object.keys(data[0])[0]; // أخذ اسم العمود الأول
+          const column2 = Object.keys(data[0])[1]; // أخذ اسم العمود الثاني
+
+          populateDropdown(rowDropdown, data.map(item => item[column1]).filter(unique));
+          populateDropdown(columnDropdown, data.map(item => item[column2]).filter(unique));
 
           // تصفية البيانات عند تغيير القيم في القوائم المنسدلة
           rowDropdown.addEventListener('change', () => filterTable(data));
@@ -146,15 +149,15 @@
       const tableBody = document.getElementById('data');
       tableBody.innerHTML = '';
 
-      data.slice(1).forEach(item => { // بدءًا من الصف الثاني
+      data.forEach(item => {
         if (
-          (rowValue === '' || item['column1'] === rowValue) &&
-          (columnValue === '' || item['column2'] === columnValue)
+          (rowValue === '' || item[Object.keys(item)[0]] === rowValue) &&
+          (columnValue === '' || item[Object.keys(item)[1]] === columnValue)
         ) {
           const row = document.createElement('tr');
-          Object.keys(item).forEach(key => {
+          Object.values(item).forEach(value => {
             const cell = document.createElement('td');
-            cell.textContent = item[key] || '';
+            cell.textContent = value || '';
             row.appendChild(cell);
           });
           tableBody.appendChild(row);
