@@ -13,25 +13,29 @@
     h1 {
       text-align: center;
       color: #333;
+      font-size: 1.5em; /* تعديل حجم الخط */
     }
     .filters {
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
+      flex-wrap: wrap; /* تمكين التفاف العناصر */
     }
     .filters select {
-      margin: 0 10px;
+      margin: 10px 5px; /* تعديل الهوامش لتقليل المسافات */
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
+      width: 100%; /* جعل القوائم المنسدلة بعرض كامل */
+      max-width: 300px; /* تحديد عرض أقصى للقوائم المنسدلة */
     }
     table {
       width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
       border-collapse: collapse;
       background-color: #fff;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      overflow-x: auto; /* تمكين التمرير الأفقي عند الحاجة */
+      display: block; /* جعل الجدول كتلة لتمكين التمرير */
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -39,6 +43,7 @@
     th, td {
       padding: 12px;
       text-align: center;
+      font-size: 0.9em; /* تعديل حجم النص */
     }
     th {
       background-color: #f2f2f2;
@@ -49,6 +54,29 @@
     }
     tbody tr:hover {
       background-color: #f1f1f1;
+    }
+
+    /* تحسينات لواجهة الموبايل */
+    @media (max-width: 768px) {
+      .filters {
+        flex-direction: column; /* جعل القوائم المنسدلة فوق بعضها */
+        align-items: center; /* محاذاة العناصر في المنتصف */
+      }
+      table, th, td {
+        font-size: 0.8em; /* تصغير حجم الخط قليلاً على الشاشات الصغيرة */
+      }
+      th, td {
+        padding: 8px; /* تقليل المسافة الداخلية للخلية */
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.2em; /* تقليل حجم عنوان الصفحة */
+      }
+      .filters select {
+        max-width: none; /* إلغاء الحد الأقصى لعرض القوائم المنسدلة */
+      }
     }
   </style>
 </head>
