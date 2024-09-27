@@ -3,43 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مجموع الأرقام</title>
+    <title>موقعي التعليمي</title>
     <style>
         body {
-            margin: 0;
-            padding: 20px;
-            background-color: #fff; /* خلفية بيضاء */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
         }
-        input {
-            margin: 10px;
-            padding: 10px;
-            width: 100px;
+        h1 {
+            color: #333;
         }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
+        p {
+            line-height: 1.5;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <h1>احسب مجموع الأرقام</h1>
-    <input type="number" id="number1" placeholder="رقم 1" />
-    <input type="number" id="number2" placeholder="رقم 2" />
-    <button onclick="calculateSum()">احسب</button>
-    <h2>المجموع: <span id="result">0</span></h2>
-
-    <script>
-        function calculateSum() {
-            const num1 = parseFloat(document.getElementById('number1').value) || 0;
-            const num2 = parseFloat(document.getElementById('number2').value) || 0;
-            const sum = num1 + num2;
-            document.getElementById('result').textContent = sum;
-        }
-    </script>
+    <h1>مرحبا بكم في موقعي التعليمي!</h1>
+    <p>هذا موقع بسيط يهدف إلى تعليم أساسيات البرمجة.</p>
+    <p>يمكنكم التعرف على HTML و CSS من خلال هذا الموقع.</p>
+    <img src="https://via.placeholder.com/600x300" alt="صورة تعليمية">
+    <p>لمزيد من المعلومات، زوروا <a href="https://www.w3schools.com/" target="_blank">W3Schools</a>.</p>
 </body>
 </html>
