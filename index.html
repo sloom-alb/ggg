@@ -3,56 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عرض صورة من الألبوم</title>
+    <title>صفحة بيضاء</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background-color: #fff; /* اللون الأبيض */
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        input[type="file"] {
-            margin-bottom: 20px;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            display: block;
-            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-
-    <h1>اختر صورة لعرضها</h1>
-    <input type="file" id="imageInput" accept="image/*" />
-    <img id="displayImage" src="" alt="الصورة المختارة ستظهر هنا" />
-
-    <script>
-        document.getElementById('imageInput').addEventListener('change', function(event) {
-            const image = document.getElementById('displayImage');
-            const file = event.target.files[0]; // الحصول على الملف المختار
-
-            if (file) { // التحقق من وجود الملف
-                const reader = new FileReader(); // إنشاء كائن FileReader لقراءة الملف
-                reader.onload = function(e) {
-                    image.src = e.target.result; // تعيين مصدر الصورة إلى نتيجة القراءة
-                }
-                reader.readAsDataURL(file); // قراءة الملف كـ Data URL
-            }
-        });
-    </script>
-
+    <!-- المحتوى فارغ لصفحة بيضاء فقط -->
 </body>
 </html>
