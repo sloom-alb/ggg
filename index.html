@@ -136,7 +136,7 @@
       } catch (error) {
         loader.style.display = 'none'; // إخفاء مؤشر التحميل في حالة الخطأ
         console.error('حدث خطأ أثناء جلب البيانات:', error);
-        document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
+        document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات. الرجاء المحاولة لاحقًا.';
       }
     }
 
@@ -186,8 +186,8 @@
         rowDropdown.addEventListener('change', () => filterTable(data));
         columnDropdown.addEventListener('change', () => filterTable(data));
       } else {
-        console.error('البيانات غير كافية.');
-        tableBody.innerHTML = 'البيانات ليست في التنسيق المتوقع.';
+        console.error('البيانات غير كافية أو غير موجودة.');
+        tableBody.innerHTML = 'لم يتم العثور على بيانات كافية لعرضها.';
       }
     }
 
