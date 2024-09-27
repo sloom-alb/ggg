@@ -3,98 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحويل الأموال</title>
+    <title>عرض صورة من الألبوم</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+            background-color: #f4f4f9;
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
         }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-        }
         h1 {
-            margin-bottom: 20px;
             color: #333;
-            font-size: 1.8em;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 15px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1.2em;
         }
-        button {
-            width: 100%;
-            padding: 15px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1.2em;
+        input[type="file"] {
+            margin-bottom: 20px;
         }
-        button:hover {
-            background-color: #218838;
-        }
-
-        /* استعلامات الوسائط لجعل الموقع متجاوبًا مع الأجهزة المختلفة */
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 1.5em;
-            }
-            input[type="number"], button {
-                padding: 12px;
-                font-size: 1.1em;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 1.3em;
-            }
-            input[type="number"], button {
-                padding: 10px;
-                font-size: 1em;
-            }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            display: block;
+            margin-top: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>عبدالسلام</h1>
-        <input type="number" id="amount" placeholder="أدخل المبلغ لتحويله" />
-        <button onclick="transferMoney()">تحويل الأموال</button>
-    </div>
+
+    <h1>اختر صورة لعرضها</h1>
+    <input type="file" id="imageInput" accept="image/*" />
+    <img id="displayImage" src="" alt="الصورة المختارة ستظهر هنا" />
 
     <script>
-        function transferMoney() {
-            const amount = document.getElementById('amount').value;
-            if (amount && amount > 0) {
-                alert(`تم تحويل مبلغ ${amount} بنجاح إلى عبدالسلام.`);
-            } else {
-                alert('يرجى إدخال مبلغ صالح.');
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const image = document.getElementById('displayImage');
+            const file = event.target.files[0]; // الحصول على الملف المختار
+
+            if (file) { // التحقق من وجود الملف
+                const reader = new FileReader(); // إنشاء كائن FileReader لقراءة الملف
+                reader.onload = function(e) {
+                    image.src = e.target.result; // تعيين مصدر الصورة إلى نتيجة القراءة
+                }
+                reader.readAsDataURL(file); // قراءة الملف كـ Data URL
             }
-        }
+        });
     </script>
+
 </body>
 </html>
