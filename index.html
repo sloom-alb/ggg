@@ -3,34 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقعي التعليمي</title>
+    <title>إرسال معلومات</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            line-height: 1.5;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-        a {
-            color: #007bff;
-            text-decoration: none;
-        }
+        body { font-family: Arial, sans-serif; direction: rtl; }
+        .form-container { max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"], textarea { width: 100%; padding: 8px; }
+        button { padding: 10px 15px; }
     </style>
 </head>
 <body>
-    <h1>مرحبا بكم في موقعي التعليمي!</h1>
-    <p>هذا موقع بسيط يهدف إلى تعليم أساسيات البرمجة.</p>
-    <p>يمكنكم التعرف على HTML و CSS من خلال هذا الموقع.</p>
-    <img src="https://via.placeholder.com/600x300" alt="صورة تعليمية">
-    <p>لمزيد من المعلومات، زوروا <a href="https://www.w3schools.com/" target="_blank">W3Schools</a>.</p>
+    <div class="form-container">
+        <h2>إرسال معلومات</h2>
+        <form action="submit.php" method="POST">
+            <div class="form-group">
+                <label for="name">الاسم:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="message">الرسالة:</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+            </div>
+            <button type="submit">إرسال</button>
+        </form>
+    </div>
 </body>
 </html>
