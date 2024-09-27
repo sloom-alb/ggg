@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة إكس أو وعجلة الحظ</title>
+    <title>لعبة إكس أو</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,13 +17,13 @@
             color: #333;
         }
 
-        #tic-tac-toe, #wheel-of-fortune {
+        #tic-tac-toe {
             margin: 20px auto;
             padding: 20px;
             background: #fff;
             border: 1px solid #ddd;
             border-radius: 8px;
-            width: 300px;
+            width: 320px; /* عرض يتناسب مع حجم الشبكة */
         }
 
         .game-board {
@@ -76,7 +76,7 @@
     </style>
 </head>
 <body>
-    <h1>مرحباً بك في موقع الألعاب</h1>
+    <h1>مرحباً بك في لعبة إكس أو</h1>
     <div id="tic-tac-toe">
         <h2>لعبة إكس أو</h2>
         <div class="game-board">
@@ -93,18 +93,61 @@
         <button id="reset">إعادة تعيين اللعبة</button>
     </div>
 
-    <div id="wheel-of-fortune">
-        <h2>عجلة الحظ</h2>
-        <canvas id="wheel" width="300" height="300"></canvas>
-        <button id="spin">أدر العجلة</button>
-    </div>
-
     <script>
-        // JavaScript for Tic Tac Toe
+        // تعريف الخلايا والزر
         const cells = document.querySelectorAll('.cell');
         const resetButton = document.getElementById('reset');
-        let currentPlayer = 'X';
-        let board = ['', '', '', '', '', '', '', '', ''];
+        let currentPlayer = 'X'; // اللاعب الحالي
+        let board = ['', '', '', '', '', '', '', '', '']; // حالة اللوحة
 
+        // إضافة حدث النقر على كل خلية
         cells.forEach(cell => {
-            cell.addEvent
+            cell.addEventListener('click', handleCellClick);
+        });
+
+        // حدث النقر على الخلية
+        function handleCellClick(event) {
+            const cellIndex = event.target.getAttribute('data-index'); // الحصول على الفهرس
+            if (board[cellIndex] === '') { // التأكد من أن الخلية فارغة
+                board[cellIndex] = currentPlayer; // تعيين اللاعب الحالي في اللوحة
+                event.target.textContent = currentPlayer; // عرض اللاعب في الخلية
+                event.target.classList.add(currentPlayer); // إضافة الكلاس لتمييز اللون
+
+                if (checkWinner()) { // التحقق من وجود فائز
+                    setTimeout(() => alert(`الفائز هو ${currentPlayer}`), 10);
+                    resetGame(); // إعادة تعيين اللعبة بعد الفوز
+                } else if (board.every(cell => cell !== '')) { // التحقق من التعادل
+                    setTimeout(() => alert('تعادل!'), 10);
+                    resetGame(); // إعادة تعيين اللعبة بعد التعادل
+                }
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X'; // تغيير اللاعب
+            }
+        }
+
+        // التحقق من الفائز
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // صفوف
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // أعمدة
+                [0, 4, 8], [2, 4, 6] // قطرين
+            ];
+            return winningCombinations.some(combination => {
+                return combination.every(index => board[index] === currentPlayer);
+            });
+        }
+
+        // إعادة تعيين اللعبة
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', '']; // إعادة تعيين اللوحة
+            cells.forEach(cell => {
+                cell.textContent = ''; // تفريغ كل الخلايا
+                cell.classList.remove('X', 'O'); // إزالة الكلاسات
+            });
+            currentPlayer = 'X'; // إعادة تعيين اللاعب
+        }
+
+        // إضافة حدث النقر على زر إعادة التعيين
+        resetButton.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
