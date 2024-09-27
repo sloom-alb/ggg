@@ -3,20 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>صفحة خضراء</title>
+    <title>مجموع الأرقام</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
-            background-color: #AAA; /*اللون الأخضر*/
-            height: 100vh;
+            padding: 20px;
+            background-color: #fff; /* خلفية بيضاء */
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            height: 100vh;
+        }
+        input {
+            margin: 10px;
+            padding: 10px;
+            width: 100px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- المحتوى فارغ لصفحة خضراء فقط -->
+    <h1>احسب مجموع الأرقام</h1>
+    <input type="number" id="number1" placeholder="رقم 1" />
+    <input type="number" id="number2" placeholder="رقم 2" />
+    <button onclick="calculateSum()">احسب</button>
+    <h2>المجموع: <span id="result">0</span></h2>
+
+    <script>
+        function calculateSum() {
+            const num1 = parseFloat(document.getElementById('number1').value) || 0;
+            const num2 = parseFloat(document.getElementById('number2').value) || 0;
+            const sum = num1 + num2;
+            document.getElementById('result').textContent = sum;
+        }
+    </script>
 </body>
 </html>
