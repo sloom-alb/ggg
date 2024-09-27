@@ -46,9 +46,17 @@
     <!-- كود JavaScript بداخل ملف HTML -->
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
+            // التحقق من وجود العناصر
             const ball = document.getElementById('ball');
             const gameContainer = document.getElementById('game-container');
             const scoreDisplay = document.getElementById('score');
+            
+            // إذا كانت أي من هذه العناصر غير موجودة، أوقف التنفيذ
+            if (!ball || !gameContainer || !scoreDisplay) {
+                console.error("هناك مشكلة في العثور على عناصر اللعبة. تأكد من صحة هيكل HTML.");
+                return;
+            }
+
             let score = 0;
 
             // تحريك الكرة إلى مكان عشوائي في الحاوية
