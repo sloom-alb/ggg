@@ -36,19 +36,42 @@
         .cell {
             width: 100px;
             height: 100px;
-            background: #f9f9f9;
+            background: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 36px; /* حجم أكبر للرموز */
+            font-weight: bold; /* خط عريض */
             cursor: pointer;
-            border: 1px solid #ccc;
+            border: 1px solid #333; /* لون أغمق لإظهار الحدود */
+            transition: background-color 0.3s ease;
+        }
+
+        .cell:hover {
+            background-color: #f0f0f0; /* تمييز الخلية عند المرور فوقها */
+        }
+
+        .cell.X {
+            color: #2196F3; /* لون أزرق للـ X */
+        }
+
+        .cell.O {
+            color: #f44336; /* لون أحمر للـ O */
         }
 
         button {
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049; /* لون أغمق عند التمرير */
         }
     </style>
 </head>
@@ -84,77 +107,4 @@
         let board = ['', '', '', '', '', '', '', '', ''];
 
         cells.forEach(cell => {
-            cell.addEventListener('click', handleCellClick);
-        });
-
-        resetButton.addEventListener('click', resetGame);
-
-        function handleCellClick(event) {
-            const cellIndex = event.target.getAttribute('data-index');
-            if (board[cellIndex] === '') {
-                board[cellIndex] = currentPlayer;
-                event.target.textContent = currentPlayer;
-                if (checkWinner()) {
-                    setTimeout(() => alert(`الفائز هو ${currentPlayer}`), 10);
-                    resetGame();
-                } else if (board.every(cell => cell !== '')) {
-                    setTimeout(() => alert('تعادل'), 10);
-                    resetGame();
-                }
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-            }
-        }
-
-        function checkWinner() {
-            const winningCombinations = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8],
-                [0, 3, 6], [1, 4, 7], [2, 5, 8],
-                [0, 4, 8], [2, 4, 6]
-            ];
-            return winningCombinations.some(combination => {
-                return combination.every(index => board[index] === currentPlayer);
-            });
-        }
-
-        function resetGame() {
-            board = ['', '', '', '', '', '', '', '', ''];
-            cells.forEach(cell => cell.textContent = '');
-            currentPlayer = 'X';
-        }
-
-        // JavaScript for Wheel of Fortune
-        const canvas = document.getElementById('wheel');
-        const ctx = canvas.getContext('2d');
-        const spinButton = document.getElementById('spin');
-        let startAngle = 0;
-        let arc = Math.PI / 4;
-        let spinTimeout = null;
-        let spinAngleStart = 10;
-        let spinTime = 0;
-        let spinTimeTotal = 0;
-
-        const options = [
-            'جائزة 1', 'جائزة 2', 'جائزة 3', 
-            'جائزة 4', 'جائزة 5', 'جائزة 6', 
-            'جائزة 7', 'جائزة 8'
-        ];
-
-        drawWheel();
-
-        spinButton.addEventListener('click', spin);
-
-        function drawWheel() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < options.length; i++) {
-                const angle = startAngle + i * arc;
-                ctx.fillStyle = i % 2 === 0 ? '#FFD700' : '#87CEEB';
-                ctx.beginPath();
-                ctx.arc(150, 150, 150, angle, angle + arc, false);
-                ctx.lineTo(150, 150);
-                ctx.fill();
-                ctx.stroke();
-                ctx.save();
-                ctx.fillStyle = '#000';
-                ctx.translate(150 + Math.cos(angle + arc / 2) *
+            cell.addEvent
