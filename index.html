@@ -42,6 +42,45 @@
         <div id="score">النقاط: 0</div>
         <div id="ball"></div>
     </div>
-    <script src="script.js"></script>
+
+    <!-- كود JavaScript بداخل ملف HTML -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const ball = document.getElementById('ball');
+            const gameContainer = document.getElementById('game-container');
+            const scoreDisplay = document.getElementById('score');
+            let score = 0;
+
+            // تحريك الكرة إلى مكان عشوائي في الحاوية
+            function moveBall() {
+                const containerWidth = gameContainer.clientWidth;
+                const containerHeight = gameContainer.clientHeight;
+                const ballWidth = ball.clientWidth;
+                const ballHeight = ball.clientHeight;
+
+                const maxX = containerWidth - ballWidth;
+                const maxY = containerHeight - ballHeight;
+
+                const randomX = Math.floor(Math.random() * maxX);
+                const randomY = Math.floor(Math.random() * maxY);
+
+                ball.style.left = `${randomX}px`;
+                ball.style.top = `${randomY}px`;
+            }
+
+            // زيادة النقاط عند النقر على الكرة وتحريكها
+            ball.addEventListener('click', () => {
+                score += 1;
+                scoreDisplay.textContent = `النقاط: ${score}`;
+                moveBall();
+            });
+
+            // تحريك الكرة بشكل تلقائي كل 1.5 ثانية
+            setInterval(moveBall, 1500);
+
+            // بدء اللعبة بتحريك الكرة لأول مرة
+            moveBall();
+        });
+    </script>
 </body>
 </html>
