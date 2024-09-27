@@ -3,30 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إرسال معلومات</title>
+    <title>لعبة Catch the Ball</title>
     <style>
-        body { font-family: Arial, sans-serif; direction: rtl; }
-        .form-container { max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; }
-        input[type="text"], textarea { width: 100%; padding: 8px; }
-        button { padding: 10px 15px; }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            position: relative;
+            width: 600px;
+            height: 400px;
+            border: 2px solid #000;
+            background-color: #fff;
+        }
+        #ball {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ff6347;
+            cursor: pointer;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+        }
     </style>
 </head>
 <body>
-    <div class="form-container">
-        <h2>إرسال معلومات</h2>
-        <form action="submit.php" method="POST">
-            <div class="form-group">
-                <label for="name">الاسم:</label>
-                <input type="text" id="name" name="name" required>
-            </div>
-            <div class="form-group">
-                <label for="message">الرسالة:</label>
-                <textarea id="message" name="message" rows="4" required></textarea>
-            </div>
-            <button type="submit">إرسال</button>
-        </form>
+    <div id="game-container">
+        <div id="score">النقاط: 0</div>
+        <div id="ball"></div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
