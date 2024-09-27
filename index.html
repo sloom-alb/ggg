@@ -3,100 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة المقطار</title>
+    <title>لعبة إكس أو وعجلة الحظ</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
             font-family: Arial, sans-serif;
-        }
-        #game-container {
-            display: grid;
-            grid-template-columns: repeat(7, 50px);
-            grid-template-rows: repeat(7, 50px);
-            gap: 10px;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
             padding: 20px;
-            background-color: #fff;
-            border: 2px solid #000;
         }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        #tic-tac-toe, #wheel-of-fortune {
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
         .cell {
-            width: 50px;
-            height: 50px;
-            border: 1px solid #ccc;
+            width: 100px;
+            height: 100px;
+            background: #f9f9f9;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
             font-size: 24px;
+            cursor: pointer;
+            border: 1px solid #ccc;
         }
-        .cell:hover {
-            background-color: #f0f0f0;
-        }
-        .player1 {
-            color: blue;
-        }
-        .player2 {
-            color: red;
-        }
-        #info {
-            margin-top: 20px;
-            font-size: 20px;
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div>
-        <div id="game-container"></div>
-        <div id="info">الدور: لاعب 1</div>
+    <h1>مرحباً بك في موقع الألعاب</h1>
+    <div id="tic-tac-toe">
+        <h2>لعبة إكس أو</h2>
+        <div class="game-board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+        <button id="reset">إعادة تعيين اللعبة</button>
     </div>
+
+    <div id="wheel-of-fortune">
+        <h2>عجلة الحظ</h2>
+        <canvas id="wheel" width="300" height="300"></canvas>
+        <button id="spin">أدر العجلة</button>
+    </div>
+
     <script>
-        // إعداد المتغيرات الأساسية
-        let currentPlayer = 'player1';  // اللاعب الحالي
-        let gameState = Array(7).fill().map(() => Array(7).fill(null));  // حالة اللعبة
+        // JavaScript for Tic Tac Toe
+        const cells = document.querySelectorAll('.cell');
+        const resetButton = document.getElementById('reset');
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
 
-        // تحديد مواقع الحركات القانونية في اللعبة
-        const legalMoves = [
-            [0, 0], [0, 3], [0, 6],
-            [1, 1], [1, 3], [1, 5],
-            [2, 2], [2, 3], [2, 4],
-            [3, 0], [3, 1], [3, 2], [3, 4], [3, 5], [3, 6],
-            [4, 2], [4, 3], [4, 4],
-            [5, 1], [5, 3], [5, 5],
-            [6, 0], [6, 3], [6, 6]
-        ];
-
-        // تهيئة اللوحة وإضافة خلايا اللعب
-        const gameContainer = document.getElementById('game-container');
-        legalMoves.forEach(([row, col]) => {
-            const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.dataset.row = row;
-            cell.dataset.col = col;
-            gameContainer.appendChild(cell);
-
-            // إضافة حدث النقر على الخلايا
-            cell.addEventListener('click', () => {
-                if (!gameState[row][col]) {
-                    gameState[row][col] = currentPlayer;
-                    cell.classList.add(currentPlayer);
-                    switchPlayer();
-                }
-            });
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
         });
 
-        // تغيير الدور بين اللاعبين
-        function switchPlayer() {
-            currentPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
-            document.getElementById('info').textContent = `الدور: ${currentPlayer === 'player1' ? 'لاعب 1' : 'لاعب 2'}`;
+        resetButton.addEventListener('click', resetGame);
+
+        function handleCellClick(event) {
+            const cellIndex = event.target.getAttribute('data-index');
+            if (board[cellIndex] === '') {
+                board[cellIndex] = currentPlayer;
+                event.target.textContent = currentPlayer;
+                if (checkWinner()) {
+                    setTimeout(() => alert(`الفائز هو ${currentPlayer}`), 10);
+                    resetGame();
+                } else if (board.every(cell => cell !== '')) {
+                    setTimeout(() => alert('تعادل'), 10);
+                    resetGame();
+                }
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
         }
 
-        // التحقق من الفوز أو الطاحونة (يمكن تحسينه بإضافة الشروط اللازمة)
-        function checkForWin() {
-            // هنا يمكن إضافة منطق الفوز والتأكد من "الطاحونة"
+        function checkWinner() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winningCombinations.some(combination => {
+                return combination.every(index => board[index] === currentPlayer);
+            });
         }
-    </script>
-</body>
-</html>
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            cells.forEach(cell => cell.textContent = '');
+            currentPlayer = 'X';
+        }
+
+        // JavaScript for Wheel of Fortune
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const spinButton = document.getElementById('spin');
+        let startAngle = 0;
+        let arc = Math.PI / 4;
+        let spinTimeout = null;
+        let spinAngleStart = 10;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+
+        const options = [
+            'جائزة 1', 'جائزة 2', 'جائزة 3', 
+            'جائزة 4', 'جائزة 5', 'جائزة 6', 
+            'جائزة 7', 'جائزة 8'
+        ];
+
+        drawWheel();
+
+        spinButton.addEventListener('click', spin);
+
+        function drawWheel() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < options.length; i++) {
+                const angle = startAngle + i * arc;
+                ctx.fillStyle = i % 2 === 0 ? '#FFD700' : '#87CEEB';
+                ctx.beginPath();
+                ctx.arc(150, 150, 150, angle, angle + arc, false);
+                ctx.lineTo(150, 150);
+                ctx.fill();
+                ctx.stroke();
+                ctx.save();
+                ctx.fillStyle = '#000';
+                ctx.translate(150 + Math.cos(angle + arc / 2) *
