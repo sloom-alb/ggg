@@ -50,7 +50,7 @@
             fetch(url)
             .then(response => response.json())
             .then(data => {
-                if (data.values) {
+                if (data.values && data.values.length > 1) {
                     console.log('Data fetched successfully:', data.values);  // عرض البيانات للتأكد من جلبها
                     allData = data.values;  // تخزين البيانات للاستخدام لاحقًا
                     populateFilters(allData);  // تحديث القوائم المنسدلة
