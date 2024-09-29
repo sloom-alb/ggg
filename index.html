@@ -1,1 +1,63 @@
-محمد
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Google Sheets Data</title>
+</head>
+<body>
+  <h1>Data from Google Sheets</h1>
+  <label for="column1">Select from Column 1:</label>
+  <select id="column1" onchange="fetchData()"></select>
+  <label for="column2">Select from Column 2:</label>
+  <select id="column2" onchange="fetchData()"></select>
+  <div id="data"></div>
+  <script>
+    function fetchData() {
+      var col1Value = document.getElementById('column1').value;
+      var col2Value = document.getElementById('column2').value;
+      var url = 'https://script.google.com/macros/s/AKfycbwbP5VqsHW_Y819sjjdBSUQjqpj10Ed0UZIsypcflpyx5vrkl2t0YeCeKtHAVdEYOb3gA/exec';
+      fetch(url + '?col1=' + encodeURIComponent(col1Value) + '&col2=' + encodeURIComponent(col2Value))
+        .then(response => response.json())
+        .then(data => displayData(data))
+        .catch(error => console.error('Error:', error));
+    }
+
+    function displayData(data) {
+      var output = '<table border="1">';
+      data.forEach(function(row) {
+        output += '<tr>';
+        row.forEach(function(cell) {
+          output += '<td>' + cell + '</td>';
+        });
+        output += '</tr>';
+      });
+      output += '</table>';
+      document.getElementById('data').innerHTML = output;
+    }
+
+    function populateDropdowns(uniqueValues1, uniqueValues2) {
+      var column1 = document.getElementById('column1');
+      var column2 = document.getElementById('column2');
+
+      uniqueValues1.forEach(function(value) {
+        var option = document.createElement('option');
+        option.value = value;
+        option.text = value;
+        column1.add(option);
+      });
+
+      uniqueValues2.forEach(function(value) {
+        var option = document.createElement('option');
+        option.value = value;
+        option.text = value;
+        column2.add(option);
+      });
+    }
+
+    window.onload = function() {
+      var url = 'https://script.google.com/macros/s/AKfycbwbP5VqsHW_Y819sjjdBSUQjqpj10Ed0UZIsypcflpyx5vrkl2t0YeCeKtHAVdEYOb3gA/exec';
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          var uniqueValues1 = [...new Set(data.map(row => row[0]))];
+          var uniqueValues2
+
