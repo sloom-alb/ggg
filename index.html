@@ -50,11 +50,20 @@
 
     <h1>بيانات من Google Sheets</h1>
     
-    <!-- القائمة المنسدلة لاختيار عمود الفرز -->
-    <label for="sortColumn">اختر عمود الفرز:</label>
-    <select id="sortColumn">
-        <option value="0">العمود الأول</option>
-        <option value="1">العمود الثاني</option>
+    <!-- القائمة المنسدلة لفرز العمود الأول -->
+    <label for="sortColumn1">فرز حسب العمود الأول:</label>
+    <select id="sortColumn1">
+        <option value="none">بدون فرز</option>
+        <option value="asc">تصاعدي</option>
+        <option value="desc">تنازلي</option>
+    </select>
+
+    <!-- القائمة المنسدلة لفرز العمود الثاني -->
+    <label for="sortColumn2">فرز حسب العمود الثاني:</label>
+    <select id="sortColumn2">
+        <option value="none">بدون فرز</option>
+        <option value="asc">تصاعدي</option>
+        <option value="desc">تنازلي</option>
     </select>
 
     <table id="data-table">
@@ -71,7 +80,8 @@
         // الرابط المباشر للـ Google Sheets بصيغة TSV
         const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToyab6Yzi0hCjwf2Cd49fj6-bLb7m2zMH9S4U6aNA05Xsxj9qlb9-F-YIwEcLPGq-LyQQNgC2_H3rR/pub?output=tsv';
 
-        let currentSortColumn = 0; // العمود الافتراضي للفرز
+        let sortColumn1 = 'none'; // حالة فرز العمود الأول
+        let sortColumn2 = 'none'; // حالة فرز العمود الثاني
 
         // دالة لجلب البيانات وتحديثها
         function fetchDataAndUpdate() {
@@ -81,21 +91,32 @@
                     const rows = data.trim().split('\n').map(row => row.split('\t'));
                     const headers = rows.shift(); // حفظ الصف الأول (العناوين)
 
-                    // فرز البيانات حسب العمود المختار
-                    rows.sort((a, b) => compareValues(a[currentSortColumn], b[currentSortColumn]));
+                    // فرز البيانات حسب الاختيار في القائمتين
+                    if (sortColumn1 !== 'none') {
+                        rows.sort((a, b) => sortValues(a[0], b[0], sortColumn1));
+                    }
+                    if (sortColumn2 !== 'none') {
+                        rows.sort((a, b) => sortValues(a[1], b[1], sortColumn2));
+                    }
 
                     updateTable(headers, rows);  // تحديث الجدول بعد الفرز
                 })
                 .catch(error => console.error('خطأ في جلب البيانات:', error));
         }
 
-        // دالة مقارنة القيم (نصوص أو أرقام)
-        function compareValues(value1, value2) {
+        // دالة مقارنة القيم (نصوص أو أرقام) بناءً على نوع الفرز
+        function sortValues(value1, value2, sortType) {
             const val1 = isNaN(value1) ? value1 : parseFloat(value1);
             const val2 = isNaN(value2) ? value2 : parseFloat(value2);
-            if (val1 < val2) return -1;
-            if (val1 > val2) return 1;
-            return 0;
+            if (sortType === 'asc') {
+                if (val1 < val2) return -1;
+                if (val1 > val2) return 1;
+                return 0;
+            } else if (sortType === 'desc') {
+                if (val1 < val2) return 1;
+                if (val1 > val2) return -1;
+                return 0;
+            }
         }
 
         // دالة لتحديث الجدول في الموقع
@@ -115,9 +136,15 @@
             });
         }
 
-        // تحديث العمود المختار للفرز عند تغيير القائمة المنسدلة
-        document.getElementById('sortColumn').addEventListener('change', function () {
-            currentSortColumn = parseInt(this.value); // تحديث العمود حسب القيمة المختارة
+        // تحديث الفرز بناءً على العمود الأول عند تغيير القائمة المنسدلة
+        document.getElementById('sortColumn1').addEventListener('change', function () {
+            sortColumn1 = this.value;  // تحديث طريقة الفرز
+            fetchDataAndUpdate();  // جلب البيانات مجددًا بعد اختيار العمود
+        });
+
+        // تحديث الفرز بناءً على العمود الثاني عند تغيير القائمة المنسدلة
+        document.getElementById('sortColumn2').addEventListener('change', function () {
+            sortColumn2 = this.value;  // تحديث طريقة الفرز
             fetchDataAndUpdate();  // جلب البيانات مجددًا بعد اختيار العمود
         });
 
