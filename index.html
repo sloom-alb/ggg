@@ -3,156 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع البيانات من Google Sheets</title>
+    <title>موقع يجلب البيانات من Google Sheets مع قوائم منسدلة</title>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 8px;
-            text-align: center;
-            border: 1px solid black;
-        }
-        th {
-            background-color: #f2f2f2;
-            position: sticky;
-            top: 0;
-            z-index: 1;
-        }
-        tbody {
-            display: block;
-            max-height: 300px; /* التحكم في ارتفاع الجدول */
-            overflow-y: auto;
-        }
-        tbody tr {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-        }
-        thead, tbody tr {
-            display: table;
-            width: 100%;
-            table-layout: fixed;
-        }
-        h1 {
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
         select {
-            margin: 20px;
+            margin: 10px;
             padding: 5px;
+        }
+        table {
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        td, th {
+            border: 1px solid black;
+            padding: 8px;
         }
     </style>
 </head>
 <body>
-
     <h1>بيانات من Google Sheets</h1>
-    
-    <!-- القائمة المنسدلة لفرز العمود الأول -->
-    <label for="sortColumn1">فرز حسب العمود الأول:</label>
-    <select id="sortColumn1">
-        <option value="none">بدون فرز</option>
-        <option value="asc">تصاعدي</option>
-        <option value="desc">تنازلي</option>
+
+    <!-- القوائم المنسدلة -->
+    <label for="column1Filter">اختر من العمود الأول:</label>
+    <select id="column1Filter">
+        <option value="">-- اختر --</option>
     </select>
 
-    <!-- القائمة المنسدلة لفرز العمود الثاني -->
-    <label for="sortColumn2">فرز حسب العمود الثاني:</label>
-    <select id="sortColumn2">
-        <option value="none">بدون فرز</option>
-        <option value="asc">تصاعدي</option>
-        <option value="desc">تنازلي</option>
+    <label for="column2Filter">اختر من العمود الثاني:</label>
+    <select id="column2Filter">
+        <option value="">-- اختر --</option>
     </select>
 
-    <table id="data-table">
-        <thead>
-            <tr>
-                <th>العمود الأول</th>
-                <th>العمود الثاني</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    <!-- المكان الذي ستعرض فيه البيانات -->
+    <div id="data"></div>
 
     <script>
-        // الرابط المباشر للـ Google Sheets بصيغة TSV
-        const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToyab6Yzi0hCjwf2Cd49fj6-bLb7m2zMH9S4U6aNA05Xsxj9qlb9-F-YIwEcLPGq-LyQQNgC2_H3rR/pub?output=tsv';
+        const sheetID = '1sV8b2fPxyz1234567';  // ضع هنا الـ ID الخاص بالجدول
+        const apiKey = 'YOUR_API_KEY';  // ضع هنا الـ API Key الخاص بك
+        const range = 'Sheet1!A1:D100';  // تحديد النطاق الذي تريد جلبه
 
-        let sortColumn1 = 'none'; // حالة فرز العمود الأول
-        let sortColumn2 = 'none'; // حالة فرز العمود الثاني
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
+        
+        let allData = [];
 
-        // دالة لجلب البيانات وتحديثها
-        function fetchDataAndUpdate() {
+        // جلب البيانات من Google Sheets
+        function fetchData() {
             fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    const rows = data.trim().split('\n').map(row => row.split('\t'));
-                    const headers = rows.shift(); // حفظ الصف الأول (العناوين)
-
-                    // فرز البيانات حسب الاختيار في القائمتين
-                    if (sortColumn1 !== 'none') {
-                        rows.sort((a, b) => sortValues(a[0], b[0], sortColumn1));
-                    }
-                    if (sortColumn2 !== 'none') {
-                        rows.sort((a, b) => sortValues(a[1], b[1], sortColumn2));
-                    }
-
-                    updateTable(headers, rows);  // تحديث الجدول بعد الفرز
-                })
-                .catch(error => console.error('خطأ في جلب البيانات:', error));
-        }
-
-        // دالة مقارنة القيم (نصوص أو أرقام) بناءً على نوع الفرز
-        function sortValues(value1, value2, sortType) {
-            const val1 = isNaN(value1) ? value1 : parseFloat(value1);
-            const val2 = isNaN(value2) ? value2 : parseFloat(value2);
-            if (sortType === 'asc') {
-                if (val1 < val2) return -1;
-                if (val1 > val2) return 1;
-                return 0;
-            } else if (sortType === 'desc') {
-                if (val1 < val2) return 1;
-                if (val1 > val2) return -1;
-                return 0;
-            }
-        }
-
-        // دالة لتحديث الجدول في الموقع
-        function updateTable(headers, rows) {
-            const tableBody = document.getElementById('data-table').querySelector('tbody');
-            tableBody.innerHTML = '';  // تنظيف الجدول قبل تحديثه
-
-            // إضافة البيانات الجديدة
-            rows.forEach(row => {
-                const tr = document.createElement('tr');
-                row.forEach(cell => {
-                    const td = document.createElement('td');
-                    td.textContent = cell;
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
+            .then(response => response.json())
+            .then(data => {
+                allData = data.values;  // تخزين البيانات للاستخدام لاحقًا
+                populateFilters(allData);  // تحديث القوائم المنسدلة
+                filterAndDisplayData();  // عرض البيانات بناءً على الفلاتر
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
             });
         }
 
-        // تحديث الفرز بناءً على العمود الأول عند تغيير القائمة المنسدلة
-        document.getElementById('sortColumn1').addEventListener('change', function () {
-            sortColumn1 = this.value;  // تحديث طريقة الفرز
-            fetchDataAndUpdate();  // جلب البيانات مجددًا بعد اختيار العمود
-        });
+        // استخراج القيم الفريدة وملء القوائم المنسدلة
+        function populateFilters(data) {
+            const column1Values = [...new Set(data.slice(1).map(row => row[0]))];  // استخراج القيم الفريدة من العمود الأول
+            const column2Values = [...new Set(data.slice(1).map(row => row[1]))];  // استخراج القيم الفريدة من العمود الثاني
 
-        // تحديث الفرز بناءً على العمود الثاني عند تغيير القائمة المنسدلة
-        document.getElementById('sortColumn2').addEventListener('change', function () {
-            sortColumn2 = this.value;  // تحديث طريقة الفرز
-            fetchDataAndUpdate();  // جلب البيانات مجددًا بعد اختيار العمود
-        });
+            const column1Filter = document.getElementById('column1Filter');
+            const column2Filter = document.getElementById('column2Filter');
 
-        // جلب البيانات وتحديثها كل ثانية واحدة
-        fetchDataAndUpdate();  // أول جلب للبيانات
-        setInterval(fetchDataAndUpdate, 1000);  // تحديث كل ثانية واحدة
+            // تفريغ القوائم الحالية
+            column1Filter.innerHTML = '<option value="">-- اختر --</option>';
+            column2Filter.innerHTML = '<option value="">-- اختر --</option>';
 
+            // ملء القوائم بالقيم الفريدة
+            column1Values.forEach(value => {
+                let option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                column1Filter.appendChild(option);
+            });
+
+            column2Values.forEach(value => {
+                let option = document.createElement('option');
+                option.value = value;
+                option.textContent = value;
+                column2Filter.appendChild(option);
+            });
+        }
+
+        // عرض البيانات بناءً على الفلاتر المختارة
+        function filterAndDisplayData() {
+            const selectedColumn1 = document.getElementById('column1Filter').value;
+            const selectedColumn2 = document.getElementById('column2Filter').value;
+
+            let filteredData = allData.slice(1);  // حذف الصف الأول (العناوين)
+
+            if (selectedColumn1) {
+                filteredData = filteredData.filter(row => row[0] === selectedColumn1);
+            }
+
+            if (selectedColumn2) {
+                filteredData = filteredData.filter(row => row[1] === selectedColumn2);
+            }
+
+            displayData(filteredData);
+        }
+
+        // عرض البيانات في الجدول
+        function displayData(data) {
+            let output = '<table><thead><tr>';
+            output += '<th>العمود الأول</th><th>العمود الثاني</th><th>العمود الثالث</th><th>العمود الرابع</th>';
+            output += '</tr></thead><tbody>';
+
+            data.forEach(row => {
+                output += '<tr>';
+                row.forEach(cell => {
+                    output += `<td>${cell}</td>`;
+                });
+                output += '</tr>';
+            });
+
+            output += '</tbody></table>';
+            document.getElementById('data').innerHTML = output;
+        }
+
+        // تحديث البيانات كل ثانية
+        setInterval(fetchData, 1000);
+
+        // ربط الفلاتر بتحديث العرض عند التغيير
+        document.getElementById('column1Filter').addEventListener('change', filterAndDisplayData);
+        document.getElementById('column2Filter').addEventListener('change', filterAndDisplayData);
+
+        // جلب البيانات عند تحميل الصفحة
+        fetchData();
     </script>
-
 </body>
 </html>
