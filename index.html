@@ -1,99 +1,37 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جلب بيانات من Google Sheets</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جلب البيانات من Google Sheets</title>
 </head>
 <body>
 
-    <h1>البيانات من Google Sheets</h1>
-    <table id="data-table">
-        <thead>
-            <tr>
-                <th>العمود الأول</th>
-                <th>العمود الثاني</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- سيتم إدخال البيانات هنا -->
-        </tbody>
-    </table>
+  <h1>البيانات من Google Sheets</h1>
+  <div id="data"></div>
 
-    <script>
-        // معرف الجدول (Spreadsheet ID)
-        const spreadsheetId = 'YOUR_SPREADSHEET_ID';  // استبدل هذا بمعرف جدول البيانات الخاص بك
-        const sheetName = 'Sheet1';  // اسم الورقة الخاصة بك
+  <script>
+    // دالة لجلب البيانات من Google Sheets
+    async function fetchData() {
+      try {
+        // جلب البيانات من الرابط المقدم
+        const response = await fetch('https://script.google.com/macros/s/AKfycbz8Qi4WSYBZ1uUanZZHskyuU8YUHo1JcmLzzl-5GUCU2UFJSPkPFHYX-86ybxR949r6ug/exec');
+        
+        // تحويل البيانات إلى صيغة JSON
+        const data = await response.json();
+        
+        // عرض البيانات في الصفحة داخل div بعنصر id "data"
+        document.getElementById('data').innerHTML = JSON.stringify(data, null, 2);
+      } catch (error) {
+        // في حالة وجود خطأ أثناء جلب البيانات
+        console.error('حدث خطأ أثناء جلب البيانات:', error);
+        document.getElementById('data').innerHTML = 'حدث خطأ أثناء جلب البيانات.';
+      }
+    }
 
-        // رابط API لجلب البيانات من Google Sheets
-        const url = https://spreadsheets.google.com/feeds/cells/${spreadsheetId}/1/public/full?alt=json;
-
-        // جلب البيانات باستخدام fetch API
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                // قم بتهيئة البيانات واستخراج المعلومات المفيدة
-                const entries = data.feed.entry;
-                const tableBody = document.querySelector('#data-table tbody');
-
-                // متغير للاحتفاظ بالصف الحالي
-                let currentRow = [];
-
-                // المرور على كل الإدخالات في الجدول
-                entries.forEach(entry => {
-                    const cellValue = entry.gs$cell.$t;
-                    const col = entry.gs$cell.col;
-                    
-                    if (col == 1) {
-                        // إذا كنا في العمود الأول، أضف الصف الحالي إلى الجدول
-                        if (currentRow.length > 0) {
-                            addRowToTable(tableBody, currentRow);
-                        }
-                        currentRow = [cellValue];  // بدء صف جديد
-                    } else {
-                        currentRow.push(cellValue);  // إضافة البيانات إلى الصف الحالي
-                    }
-                });
-
-                // أضف الصف الأخير
-                if (currentRow.length > 0) {
-                    addRowToTable(tableBody, currentRow);
-                }
-            })
-            .catch(error => console.error('حدث خطأ:', error));
-
-        // دالة لإضافة صف إلى الجدول
-        function addRowToTable(tableBody, rowData) {
-            const row = document.createElement('tr');
-            rowData.forEach(cellData => {
-                const cell = document.createElement('td');
-                cell.textContent = cellData;
-                row.appendChild(cell);
-            });
-            tableBody.appendChild(row);
-        }
-    </script>
+    // استدعاء الدالة لجلب البيانات عند تحميل الصفحة
+    fetchData();
+  </script>
 
 </body>
 </html>
