@@ -1,6 +1,6 @@
 function doGet(e) {
   // احصل على الورقة المطلوبة من جدول البيانات
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('درجات الأسبوع (حفظ)'); // استبدل "Sheet1" باسم ورقتك
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('درجات الأسبوع (حفظ)'); // استبدل باسم الورقة الخاص بك
   
   // احصل على جميع البيانات الموجودة في الورقة
   var data = sheet.getDataRange().getValues();
@@ -10,16 +10,14 @@ function doGet(e) {
   
   // معالجة كل صف في الورقة وتحويله إلى JSON
   for (var i = 0; i < data.length; i++) {
-    jsonData.push({
-      column1: data[i][0],  // العمود الأول
-      column2: data[i][0],  // العمود الثاني
-      column3: data[i][0],  // العمود الثالث
-      column4: data[i][0],  // العمود الربع
-      column5: data[i][0],  // العمود الخامس
-      column6: data[i][0],  // العمود السادس
-      column7: data[i][1],  //العمود السابع
-      // يمكنك إضافة المزيد من الأعمدة حسب الحاجة
-    });
+    var row = {};
+    
+    // استخدم عدد الأعمدة الفعلي في الورقة
+    for (var j = 0; j < Math.min(20, data[i].length); j++) {
+      row['column' + (j + 1)] = data[i][j] || ''; // عرض القيمة من العمود، مع ضمان أنه لا توجد أخطاء في حالة وجود بيانات ناقصة
+    }
+    
+    jsonData.push(row);
   }
   
   // إرجاع البيانات على هيئة JSON
