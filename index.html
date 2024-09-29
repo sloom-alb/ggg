@@ -10,27 +10,58 @@
             border-collapse: collapse;
             margin-top: 20px;
         }
-        table, th, td {
-            border: 1px solid black;
-        }
         th, td {
             padding: 8px;
             text-align: center;
+            border: 1px solid black;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tbody {
+            display: block;
+            max-height: 300px; /* التحكم في ارتفاع الجدول */
+            overflow-y: auto;
+        }
+        tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+        thead, tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
         }
         h1 {
             text-align: center;
             font-family: Arial, sans-serif;
+        }
+        select {
+            margin: 20px;
+            padding: 5px;
         }
     </style>
 </head>
 <body>
 
     <h1>بيانات من Google Sheets</h1>
+    
+    <!-- القائمة المنسدلة لاختيار عمود الفرز -->
+    <label for="sortColumn">اختر عمود الفرز:</label>
+    <select id="sortColumn">
+        <option value="0">العمود الأول</option>
+        <option value="1">العمود الثاني</option>
+    </select>
+
     <table id="data-table">
         <thead>
             <tr>
-                <th><و/th>
-                <th>س</th>
+                <th>العمود الأول</th>
+                <th>العمود الثاني</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -40,20 +71,19 @@
         // الرابط المباشر للـ Google Sheets
         const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToyab6Yzi0hCjwf2Cd49fj6-bLb7m2zMH9S4U6aNA05Xsxj9qlb9-F-YIwEcLPGq-LyQQNgC2_H3rR/pub?output=tsv';
 
+        let currentSortColumn = 0; // العمود الافتراضي للفرز
+
         // دالة لجلب البيانات وتحديثها
         function fetchDataAndUpdate() {
             fetch(url)
                 .then(response => response.text())
                 .then(data => {
                     const rows = data.trim().split('\n').map(row => row.split('\t'));
+                    rows.shift(); // حذف الصف الأول لأنه العناوين
 
-                    // فرز البيانات حسب العمود الأول ثم الثاني
+                    // فرز البيانات حسب العمود المختار
                     rows.sort((a, b) => {
-                        if (a[0] === b[0]) {
-                            return a[1] > b[1] ? 1 : -1;
-                        } else {
-                            return a[0] > b[0] ? 1 : -1;
-                        }
+                        return a[currentSortColumn] > b[currentSortColumn] ? 1 : -1;
                     });
 
                     updateTable(rows);  // تحديث الجدول بعد الفرز
@@ -78,9 +108,16 @@
             });
         }
 
-        // جلب البيانات وتحديثها كل 30 ثانية
+        // تحديث العمود المختار للفرز عند تغيير القائمة المنسدلة
+        document.getElementById('sortColumn').addEventListener('change', function () {
+            currentSortColumn = parseInt(this.value); // تحديث العمود حسب القيمة المختارة
+            fetchDataAndUpdate();  // جلب البيانات مجددًا بعد اختيار العمود
+        });
+
+        // جلب البيانات وتحديثها كل ثانية واحدة
         fetchDataAndUpdate();  // أول جلب للبيانات
-        setInterval(fetchDataAndUpdate, 30000);  // تحديث كل 30 ثانية
+        setInterval(fetchDataAndUpdate, 1000);  // تحديث كل ثانية واحدة
+
     </script>
 
 </body>
