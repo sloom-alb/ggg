@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-    <title>موقعنا البسيط</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع البيانات من Google Sheets</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        h1 {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
 </head>
 <body>
-    <h1>مرحباً بك في موقعي!</h1>
-    <p>هذا هو أول موقع ويب لي.</p>
+
+    <h1>بيانات من Google Sheets</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>العمود الأول</th>
+                <th>العمود الثاني</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        // الرابط المباشر للـ Google Sheets
+        const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToyab6Yzi0hCjwf2Cd49fj6-bLb7m2zMH9S4U6aNA05Xsxj9qlb9-F-YIwEcLPGq-LyQQNgC2_H3rR/pub?output=tsv';
+
+        // دالة لجلب البيانات وتحديثها
+        function fetchDataAndUpdate() {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    const rows = data.trim().split('\n').map(row => row.split('\t'));
+
+                    // فرز البيانات حسب العمود الأول ثم الثاني
+                    rows.sort((a, b) => {
+                        if (a[0] === b[0]) {
+                            return a[1] > b[1] ? 1 : -1;
+                        } else {
+                            return a[0] > b[0] ? 1 : -1;
+                        }
+                    });
+
+                    updateTable(rows);  // تحديث الجدول بعد الفرز
+                })
+                .catch(error => console.error('خطأ في جلب البيانات:', error));
+        }
+
+        // دالة لتحديث الجدول في الموقع
+        function updateTable(rows) {
+            const tableBody = document.getElementById('data-table').querySelector('tbody');
+            tableBody.innerHTML = '';  // تنظيف الجدول قبل تحديثه
+
+            // إضافة البيانات الجديدة
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell;
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // جلب البيانات وتحديثها كل 30 ثانية
+        fetchDataAndUpdate();  // أول جلب للبيانات
+        setInterval(fetchDataAndUpdate, 30000);  // تحديث كل 30 ثانية
+    </script>
+
 </body>
 </html>
