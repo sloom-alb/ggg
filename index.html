@@ -39,7 +39,7 @@
     <script>
         const sheetID = '1sV8b2fPxyz1234567';  // ضع هنا الـ ID الخاص بالجدول
         const apiKey = 'YOUR_API_KEY';  // ضع هنا الـ API Key الخاص بك
-        const range = 'Sheet1!A1:D100';  // تحديد النطاق الذي تريد جلبه
+        const range = 'Sheet1!A1:D100';  // تأكد من أن النطاق يتناسب مع البيانات الفعلية
 
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
         
@@ -50,12 +50,19 @@
             fetch(url)
             .then(response => response.json())
             .then(data => {
-                allData = data.values;  // تخزين البيانات للاستخدام لاحقًا
-                populateFilters(allData);  // تحديث القوائم المنسدلة
-                filterAndDisplayData();  // عرض البيانات بناءً على الفلاتر
+                if (data.values) {
+                    console.log('Data fetched successfully:', data.values);  // عرض البيانات للتأكد من جلبها
+                    allData = data.values;  // تخزين البيانات للاستخدام لاحقًا
+                    populateFilters(allData);  // تحديث القوائم المنسدلة
+                    filterAndDisplayData();  // عرض البيانات بناءً على الفلاتر
+                } else {
+                    console.error('No data found in the response.');
+                    document.getElementById('data').innerHTML = '<p>لا توجد بيانات متاحة.</p>';
+                }
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
+                document.getElementById('data').innerHTML = '<p>حدث خطأ أثناء جلب البيانات.</p>';
             });
         }
 
@@ -73,17 +80,21 @@
 
             // ملء القوائم بالقيم الفريدة
             column1Values.forEach(value => {
-                let option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                column1Filter.appendChild(option);
+                if (value) {  // التأكد من عدم وجود قيم فارغة
+                    let option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    column1Filter.appendChild(option);
+                }
             });
 
             column2Values.forEach(value => {
-                let option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                column2Filter.appendChild(option);
+                if (value) {  // التأكد من عدم وجود قيم فارغة
+                    let option = document.createElement('option');
+                    option.value = value;
+                    option.textContent = value;
+                    column2Filter.appendChild(option);
+                }
             });
         }
 
@@ -108,6 +119,11 @@
 
         // عرض البيانات في الجدول
         function displayData(data) {
+            if (data.length === 0) {
+                document.getElementById('data').innerHTML = '<p>لا توجد بيانات لعرضها.</p>';
+                return;
+            }
+
             let output = '<table><thead><tr>';
             output += '<th>العمود الأول</th><th>العمود الثاني</th><th>العمود الثالث</th><th>العمود الرابع</th>';
             output += '</tr></thead><tbody>';
