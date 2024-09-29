@@ -14,7 +14,11 @@
     function fetchData() {
       var col1Value = document.getElementById('column1').value;
       var col2Value = document.getElementById('column2').value;
-      google.script.run.withSuccessHandler(displayData).getData(col1Value, col2Value);
+      var url = 'https://script.google.com/macros/s/AKfycbwbP5VqsHW_Y819sjjdBSUQjqpj10Ed0UZIsypcflpyx5vrkl2t0YeCeKtHAVdEYOb3gA/exec';
+      fetch(url + '?col1=' + encodeURIComponent(col1Value) + '&col2=' + encodeURIComponent(col2Value))
+        .then(response => response.json())
+        .then(data => displayData(data))
+        .catch(error => console.error('Error:', error));
     }
 
     function displayData(data) {
@@ -50,11 +54,15 @@
     }
 
     window.onload = function() {
-      google.script.run.withSuccessHandler(function(data) {
-        var uniqueValues1 = [...new Set(data.map(row => row[0]))];
-        var uniqueValues2 = [...new Set(data.map(row => row[1]))];
-        populateDropdowns(uniqueValues1, uniqueValues2);
-      }).getAllData();
+      var url = 'https://script.google.com/macros/s/AKfycbwbP5VqsHW_Y819sjjdBSUQjqpj10Ed0UZIsypcflpyx5vrkl2t0YeCeKtHAVdEYOb3gA/exec';
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          var uniqueValues1 = [...new Set(data.map(row => row[0]))];
+          var uniqueValues2 = [...new Set(data.map(row => row[1]))];
+          populateDropdowns(uniqueValues1, uniqueValues2);
+        })
+        .catch(error => console.error('Error:', error));
     };
   </script>
 </body>
