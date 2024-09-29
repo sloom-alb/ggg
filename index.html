@@ -1,25 +1,31 @@
 function doGet(e) {
-  // احصل على الورقة المطلوبة من جدول البيانات
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('درجات الأسبوع (حفظ)'); // استبدل باسم الورقة الخاص بك
-  
-  // احصل على جميع البيانات الموجودة في الورقة
-  var data = sheet.getDataRange().getValues();
-  
-  // تهيئة مصفوفة لتخزين البيانات
-  var jsonData = [];
-  
-  // معالجة كل صف في الورقة وتحويله إلى JSON
-  for (var i = 0; i < data.length; i++) {
-    var row = {};
+  try {
+    // احصل على الورقة المطلوبة من جدول البيانات
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('درجات الأسبوع (حفظ)'); // استبدل باسم الورقة الخاص بك
     
-    // استخدم عدد الأعمدة الفعلي في الورقة
-    for (var j = 0; j < Math.min(20, data[i].length); j++) {
-      row['column' + (j + 1)] = data[i][j] || ''; // عرض القيمة من العمود، مع ضمان أنه لا توجد أخطاء في حالة وجود بيانات ناقصة
+    // احصل على جميع البيانات الموجودة في الورقة
+    var data = sheet.getDataRange().getValues();
+    
+    // تهيئة مصفوفة لتخزين البيانات
+    var jsonData = [];
+    
+    // معالجة كل صف في الورقة وتحويله إلى JSON
+    for (var i = 0; i < data.length; i++) {
+      var row = {};
+      
+      // استخدم عدد الأعمدة الفعلي في الورقة
+      for (var j = 0; j < Math.min(20, data[i].length); j++) {
+        row['column' + (j + 1)] = data[i][j] || ''; // عرض القيمة من العمود، مع ضمان أنه لا توجد أخطاء في حالة وجود بيانات ناقصة
+      }
+      
+      jsonData.push(row);
     }
     
-    jsonData.push(row);
-  }
-  
-  // إرجاع البيانات على هيئة JSON
-  return ContentService.createTextOutput(JSON.stringify(jsonData)).setMimeType(ContentService.MimeType.JSON);
+    // إرجاع البيانات على هيئة JSON
+    return ContentService.createTextOutput(JSON.stringify(jsonData)).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    // عرض الأخطاء في وحدة التحكم
+    Logger.log('Error: ' + error.message);
+    return ContentService.createTextOutput('حدث خطأ: ' + error.message).setMimeType(ContentService.MimeType.TEXT);
+  }
 }
