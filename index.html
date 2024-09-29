@@ -94,6 +94,7 @@
 
             let filteredData = allData.slice(1);  // حذف الصف الأول (العناوين)
 
+            // فلترة البيانات بناءً على الفلاتر
             if (selectedColumn1) {
                 filteredData = filteredData.filter(row => row[0] === selectedColumn1);
             }
@@ -111,6 +112,7 @@
             output += '<th>العمود الأول</th><th>العمود الثاني</th><th>العمود الثالث</th><th>العمود الرابع</th>';
             output += '</tr></thead><tbody>';
 
+            // عرض البيانات بناءً على التصفية
             data.forEach(row => {
                 output += '<tr>';
                 row.forEach(cell => {
