@@ -82,14 +82,20 @@
                     const headers = rows.shift(); // حفظ الصف الأول (العناوين)
 
                     // فرز البيانات حسب العمود المختار
-                    rows.sort((a, b) => {
-                        if (a[currentSortColumn] === b[currentSortColumn]) return 0;
-                        return a[currentSortColumn] > b[currentSortColumn] ? 1 : -1;
-                    });
+                    rows.sort((a, b) => compareValues(a[currentSortColumn], b[currentSortColumn]));
 
                     updateTable(headers, rows);  // تحديث الجدول بعد الفرز
                 })
                 .catch(error => console.error('خطأ في جلب البيانات:', error));
+        }
+
+        // دالة مقارنة القيم (نصوص أو أرقام)
+        function compareValues(value1, value2) {
+            const val1 = isNaN(value1) ? value1 : parseFloat(value1);
+            const val2 = isNaN(value2) ? value2 : parseFloat(value2);
+            if (val1 < val2) return -1;
+            if (val1 > val2) return 1;
+            return 0;
         }
 
         // دالة لتحديث الجدول في الموقع
