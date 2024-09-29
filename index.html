@@ -59,11 +59,4 @@
         .then(response => response.json())
         .then(data => {
           var uniqueValues1 = [...new Set(data.map(row => row[0]))];
-          var uniqueValues2 = [...new Set(data.map(row => row[1]))];
-          populateDropdowns(uniqueValues1, uniqueValues2);
-        })
-        .catch(error => console.error('Error:', error));
-    };
-  </script>
-</body>
-</html>
+          var uniqueValues2
