@@ -68,7 +68,7 @@
     </table>
 
     <script>
-        // الرابط المباشر للـ Google Sheets
+        // الرابط المباشر للـ Google Sheets بصيغة TSV
         const url = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vToyab6Yzi0hCjwf2Cd49fj6-bLb7m2zMH9S4U6aNA05Xsxj9qlb9-F-YIwEcLPGq-LyQQNgC2_H3rR/pub?output=tsv';
 
         let currentSortColumn = 0; // العمود الافتراضي للفرز
@@ -79,20 +79,21 @@
                 .then(response => response.text())
                 .then(data => {
                     const rows = data.trim().split('\n').map(row => row.split('\t'));
-                    rows.shift(); // حذف الصف الأول لأنه العناوين
+                    const headers = rows.shift(); // حفظ الصف الأول (العناوين)
 
                     // فرز البيانات حسب العمود المختار
                     rows.sort((a, b) => {
+                        if (a[currentSortColumn] === b[currentSortColumn]) return 0;
                         return a[currentSortColumn] > b[currentSortColumn] ? 1 : -1;
                     });
 
-                    updateTable(rows);  // تحديث الجدول بعد الفرز
+                    updateTable(headers, rows);  // تحديث الجدول بعد الفرز
                 })
                 .catch(error => console.error('خطأ في جلب البيانات:', error));
         }
 
         // دالة لتحديث الجدول في الموقع
-        function updateTable(rows) {
+        function updateTable(headers, rows) {
             const tableBody = document.getElementById('data-table').querySelector('tbody');
             tableBody.innerHTML = '';  // تنظيف الجدول قبل تحديثه
 
