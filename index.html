@@ -3,153 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقع يجلب البيانات من Google Sheets مع قوائم منسدلة</title>
+    <title>جلب بيانات من Google Sheets</title>
     <style>
-        select {
-            margin: 10px;
-            padding: 5px;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
         }
         table {
-            margin-top: 20px;
+            width: 100%;
             border-collapse: collapse;
+            margin: 20px 0;
         }
-        td, th {
-            border: 1px solid black;
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
             padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-    <h1>بيانات من Google Sheets</h1>
 
-    <!-- القوائم المنسدلة -->
-    <label for="column1Filter">اختر من العمود الأول:</label>
-    <select id="column1Filter">
-        <option value="">-- اختر --</option>
-    </select>
-
-    <label for="column2Filter">اختر من العمود الثاني:</label>
-    <select id="column2Filter">
-        <option value="">-- اختر --</option>
-    </select>
-
-    <!-- المكان الذي ستعرض فيه البيانات -->
-    <div id="data"></div>
+    <h1>البيانات من Google Sheets</h1>
+    <table id="data-table">
+        <thead>
+            <tr>
+                <th>العمود الأول</th>
+                <th>العمود الثاني</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- سيتم إدخال البيانات هنا -->
+        </tbody>
+    </table>
 
     <script>
-        const sheetID = '1sV8b2fPxyz1234567';  // ضع هنا الـ ID الخاص بالجدول
-        const apiKey = 'YOUR_API_KEY';  // ضع هنا الـ API Key الخاص بك
-        const range = 'Sheet1!A1:D100';  // تأكد من أن النطاق يتناسب مع البيانات الفعلية
+        // معرف الجدول (Spreadsheet ID)
+        const spreadsheetId = 'YOUR_SPREADSHEET_ID';  // استبدل هذا بمعرف جدول البيانات الخاص بك
+        const sheetName = 'Sheet1';  // اسم الورقة الخاصة بك
 
-        const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/${range}?key=${apiKey}`;
-        
-        let allData = [];
+        // رابط API لجلب البيانات من Google Sheets
+        const url = https://spreadsheets.google.com/feeds/cells/${spreadsheetId}/1/public/full?alt=json;
 
-        // جلب البيانات من Google Sheets
-        function fetchData() {
-            fetch(url)
+        // جلب البيانات باستخدام fetch API
+        fetch(url)
             .then(response => response.json())
             .then(data => {
-                if (data.values && data.values.length > 1) {
-                    console.log('Data fetched successfully:', data.values);  // عرض البيانات للتأكد من جلبها
-                    allData = data.values;  // تخزين البيانات للاستخدام لاحقًا
-                    populateFilters(allData);  // تحديث القوائم المنسدلة
-                    filterAndDisplayData();  // عرض البيانات بناءً على الفلاتر
-                } else {
-                    console.error('No data found in the response.');
-                    document.getElementById('data').innerHTML = '<p>لا توجد بيانات متاحة.</p>';
+                // قم بتهيئة البيانات واستخراج المعلومات المفيدة
+                const entries = data.feed.entry;
+                const tableBody = document.querySelector('#data-table tbody');
+
+                // متغير للاحتفاظ بالصف الحالي
+                let currentRow = [];
+
+                // المرور على كل الإدخالات في الجدول
+                entries.forEach(entry => {
+                    const cellValue = entry.gs$cell.$t;
+                    const col = entry.gs$cell.col;
+                    
+                    if (col == 1) {
+                        // إذا كنا في العمود الأول، أضف الصف الحالي إلى الجدول
+                        if (currentRow.length > 0) {
+                            addRowToTable(tableBody, currentRow);
+                        }
+                        currentRow = [cellValue];  // بدء صف جديد
+                    } else {
+                        currentRow.push(cellValue);  // إضافة البيانات إلى الصف الحالي
+                    }
+                });
+
+                // أضف الصف الأخير
+                if (currentRow.length > 0) {
+                    addRowToTable(tableBody, currentRow);
                 }
             })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                document.getElementById('data').innerHTML = '<p>حدث خطأ أثناء جلب البيانات.</p>';
+            .catch(error => console.error('حدث خطأ:', error));
+
+        // دالة لإضافة صف إلى الجدول
+        function addRowToTable(tableBody, rowData) {
+            const row = document.createElement('tr');
+            rowData.forEach(cellData => {
+                const cell = document.createElement('td');
+                cell.textContent = cellData;
+                row.appendChild(cell);
             });
+            tableBody.appendChild(row);
         }
-
-        // استخراج القيم الفريدة وملء القوائم المنسدلة
-        function populateFilters(data) {
-            const column1Values = [...new Set(data.slice(1).map(row => row[0]))];  // استخراج القيم الفريدة من العمود الأول
-            const column2Values = [...new Set(data.slice(1).map(row => row[1]))];  // استخراج القيم الفريدة من العمود الثاني
-
-            const column1Filter = document.getElementById('column1Filter');
-            const column2Filter = document.getElementById('column2Filter');
-
-            // تفريغ القوائم الحالية
-            column1Filter.innerHTML = '<option value="">-- اختر --</option>';
-            column2Filter.innerHTML = '<option value="">-- اختر --</option>';
-
-            // ملء القوائم بالقيم الفريدة
-            column1Values.forEach(value => {
-                if (value) {  // التأكد من عدم وجود قيم فارغة
-                    let option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    column1Filter.appendChild(option);
-                }
-            });
-
-            column2Values.forEach(value => {
-                if (value) {  // التأكد من عدم وجود قيم فارغة
-                    let option = document.createElement('option');
-                    option.value = value;
-                    option.textContent = value;
-                    column2Filter.appendChild(option);
-                }
-            });
-        }
-
-        // عرض البيانات بناءً على الفلاتر المختارة
-        function filterAndDisplayData() {
-            const selectedColumn1 = document.getElementById('column1Filter').value;
-            const selectedColumn2 = document.getElementById('column2Filter').value;
-
-            let filteredData = allData.slice(1);  // حذف الصف الأول (العناوين)
-
-            // فلترة البيانات بناءً على الفلاتر
-            if (selectedColumn1) {
-                filteredData = filteredData.filter(row => row[0] === selectedColumn1);
-            }
-
-            if (selectedColumn2) {
-                filteredData = filteredData.filter(row => row[1] === selectedColumn2);
-            }
-
-            displayData(filteredData);
-        }
-
-        // عرض البيانات في الجدول
-        function displayData(data) {
-            if (data.length === 0) {
-                document.getElementById('data').innerHTML = '<p>لا توجد بيانات لعرضها.</p>';
-                return;
-            }
-
-            let output = '<table><thead><tr>';
-            output += '<th>العمود الأول</th><th>العمود الثاني</th><th>العمود الثالث</th><th>العمود الرابع</th>';
-            output += '</tr></thead><tbody>';
-
-            // عرض البيانات بناءً على التصفية
-            data.forEach(row => {
-                output += '<tr>';
-                row.forEach(cell => {
-                    output += `<td>${cell}</td>`;
-                });
-                output += '</tr>';
-            });
-
-            output += '</tbody></table>';
-            document.getElementById('data').innerHTML = output;
-        }
-
-        // تحديث البيانات كل ثانية
-        setInterval(fetchData, 1000);
-
-        // ربط الفلاتر بتحديث العرض عند التغيير
-        document.getElementById('column1Filter').addEventListener('change', filterAndDisplayData);
-        document.getElementById('column2Filter').addEventListener('change', filterAndDisplayData);
-
-        // جلب البيانات عند تحميل الصفحة
-        fetchData();
     </script>
+
 </body>
 </html>
