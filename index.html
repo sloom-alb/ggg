@@ -1,122 +1,35 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>موقعي لجلب البيانات من Google Sheets</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            direction: rtl;
-            text-align: center;
-        }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        select {
-            margin: 10px;
-            padding: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sheets Data Fetch</title>
 </head>
 <body>
-    <h1>عرض البيانات من جداول جوجل</h1>
-    
-    <label for="dropdown1">اختر من القائمة الأولى:</label>
-    <select id="dropdown1">
-        <option value="">اختر</option>
-    </select>
-    
-    <label for="dropdown2">اختر من القائمة الثانية:</label>
-    <select id="dropdown2">
-        <option value="">اختر</option>
-    </select>
-    
-    <table id="data-table">
-        <thead>
-            <tr>
-                <th>العمود الأول</th>
-                <th>العمود الثاني</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+  <div id="data"></div>
 
-    <!-- إضافة JavaScript مباشرة هنا -->
-    <script>
-        // هنا نضع رابط Google Apps Script Web App الخاص بك
-        const url = 'https://script.google.com/macros/s/AKfycbxVYFI5tZY7T4rmbQpYucJ7E1NljmkdNKx3rdfTMfEEbkHIyeyMBTEi0q0nwov_rfPWtA/exec';
+  <script>
+    async function fetchData() {
+      const url = 'https://script.google.com/macros/s/AKfycby9jbH5tk2ZMGIkA49pLxSDWgWcZEJ9e48IGfA1pNaQz9NCzFk21w8Y-RsOjq13uLQ/exec'; // ضع هنا رابط Google Apps Script
 
-        // سحب البيانات من Web App الخاص بجوجل
-        async function fetchData() {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                populateTable(data);
-                populateDropdowns(data);
-            } catch (error) {
-                console.error('خطأ في سحب البيانات:', error);
-            }
-        }
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
 
-        // إضافة البيانات إلى الجدول
-        function populateTable(values) {
-            const tbody = document.querySelector('#data-table tbody');
-            tbody.innerHTML = ''; // مسح البيانات السابقة
-            values.forEach(row => {
-                const tr = document.createElement('tr');
-                row.forEach(cell => {
-                    const td = document.createElement('td');
-                    td.textContent = cell;
-                    tr.appendChild(td);
-                });
-                tbody.appendChild(tr);
-            });
-        }
+        // عرض البيانات على الصفحة
+        const output = document.getElementById('data');
+        data.forEach(row => {
+          const rowData = Object.values(row).join(' | ');
+          output.innerHTML += `<p>${rowData}</p>`;
+        });
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    }
 
-        // إضافة البيانات إلى القوائم المنسدلة
-        function populateDropdowns(values) {
-            const dropdown1 = document.getElementById('dropdown1');
-            const dropdown2 = document.getElementById('dropdown2');
-            
-            dropdown1.innerHTML = '<option value="">اختر</option>';
-            dropdown2.innerHTML = '<option value="">اختر</option>';
-
-            // استخراج القيم الفريدة
-            const uniqueValues1 = [...new Set(values.map(row => row[0]))];
-            const uniqueValues2 = [...new Set(values.map(row => row[1]))];
-
-            // ملء القائمة المنسدلة الأولى
-            uniqueValues1.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                dropdown1.appendChild(option);
-            });
-
-            // ملء القائمة المنسدلة الثانية
-            uniqueValues2.forEach(value => {
-                const option = document.createElement('option');
-                option.value = value;
-                option.textContent = value;
-                dropdown2.appendChild(option);
-            });
-        }
-
-        // تحديث البيانات كل دقيقة
-        setInterval(fetchData, 60000);
-
-        // استدعاء الدالة لجلب البيانات وعرضها عند أول تحميل للصفحة
-        fetchData();
-    </script>
+    // استدعاء الدالة عند تحميل الصفحة
+    fetchData();
+  </script>
 </body>
 </html>
