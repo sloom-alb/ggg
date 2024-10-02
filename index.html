@@ -6,35 +6,20 @@
   <title>Google Sheets Data Fetch</title>
 </head>
 <body>
+  <h1>Data from Google Sheets</h1>
   <div id="data"></div>
-  <div id="error" style="color: red;"></div> <!-- لعرض الأخطاء هنا -->
 
   <script>
-    async function fetchData() {
-      const url = 'https://script.google.com/macros/s/AKfycbzPCF-2Vx4pzbsVcHesI4EjsXJ5ORtQtIIBNZNtgrkvDRjxDo6ouNncWIn0jzsmOIcUfA/exec'; // ضع هنا رابط Google Apps Script
-
-      try {
-        const response = await fetch(url);
-        
-        // إذا كانت الاستجابة غير صحيحة
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log(data);
-
-        // عرض البيانات على الصفحة
+    fetch('https://script.google.com/macros/s/AKfycby9jbH5tk2ZMGIkA49pLxSDWgWcZEJ9e48IGfA1pNaQz9NCzFk21w8Y-RsOjq13uLQ/exec')
+      .then(response => response.json())
+      .then(data => {
         const output = document.getElementById('data');
         data.forEach(row => {
           const rowData = Object.values(row).join(' | ');
           output.innerHTML += `<p>${rowData}</p>`;
         });
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        document.getElementById('error').innerText = `Error: ${error.message}`;
-      }
-    }
-
-    // استدعاء الدالة عند تحميل الصفحة
-    fetchData();
+      })
+      .catch(error => console.error('Error:', error));
+  </script>
+</body>
+</html>
