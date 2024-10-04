@@ -71,8 +71,9 @@
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
         
-        // إضافة الصف الأول كعنوان
+        // تأكد من وجود بيانات
         if (data.length > 0) {
+          // استخدم الصف الأول من البيانات كعناوين
           Object.keys(data[0]).forEach(header => {
             const th = document.createElement('th');
             th.innerText = header;
@@ -82,14 +83,26 @@
 
         // إضافة الصفوف إلى الجدول
         const body = output.getElementsByTagName('tbody')[0];
-        data.forEach(row => {
+
+        // ابدأ من الصف الأول من البيانات (الصفر) ليكون عنوانًا
+        data.forEach((row, index) => {
           const rowElement = document.createElement('tr');
 
-          Object.values(row).forEach(value => {
-            const cell = document.createElement('td');
-            cell.innerText = value;
-            rowElement.appendChild(cell);
-          });
+          // استخدم الصف الأول من البيانات (index === 0) كعنوان
+          if (index === 0) {
+            Object.values(row).forEach(value => {
+              const cell = document.createElement('td');
+              cell.innerText = value;
+              rowElement.appendChild(cell);
+            });
+            rowElement.classList.add('header'); // إضافة صف العنوان
+          } else {
+            Object.values(row).forEach(value => {
+              const cell = document.createElement('td');
+              cell.innerText = value;
+              rowElement.appendChild(cell);
+            });
+          }
 
           body.appendChild(rowElement);
         });
