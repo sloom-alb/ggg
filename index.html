@@ -30,8 +30,8 @@
       text-align: center;
     }
     th {
-      background-color: #4CAF50; /* لون خلفية العنوان */
-      color: white; /* لون نص العنوان */
+      background-color: #4CAF50;
+      color: white;
       font-weight: bold;
     }
     .error {
@@ -43,17 +43,32 @@
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
+
+  <label for="filterCol1">اختر قيمة من العمود الأول:</label>
+  <select id="filterCol1" onchange="filterData()">
+    <option value="">جميع القيم</option>
+  </select>
+
+  <label for="filterCol2">اختر قيمة من العمود الثاني:</label>
+  <select id="filterCol2" onchange="filterData()">
+    <option value="">جميع القيم</option>
+  </select>
+
   <table id="data">
     <thead>
-      <tr id="headerRow"></tr> <!-- صف العنوان -->
+      <tr id="headerRow"></tr>
     </thead>
     <tbody></tbody>
   </table>
   <div id="error" class="error"></div>
 
   <script>
+    let allData = []; // لتخزين جميع البيانات
+    let uniqueCol1 = []; // لتخزين القيم الفريدة للعمود الأول
+    let uniqueCol2 = []; // لتخزين القيم الفريدة للعمود الثاني
+
     async function fetchData() {
-      const url = 'https://script.google.com/macros/s/AKfycbzQwz629vPr6qKxjPs89I959VyHMn6XmewzUM-FyvasNCe0r-0lL3hiKkyzjuI9RBZd7Q/exec'; // استبدل هذا بالرابط الخاص بك
+      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec';
 
       try {
         const response = await fetch(url);
@@ -61,42 +76,75 @@
           throw new Error('استجابة الشبكة لم تكن جيدة');
         }
         const data = await response.json();
-        console.log(data); // تحقق من البيانات في وحدة التحكم
+        console.log(data);
 
-        const output = document.getElementById('data');
-        const headerRow = document.getElementById('headerRow');
+        allData = data.data; // تخزين البيانات
+        uniqueCol1 = data.uniqueCol1; // تخزين القيم الفريدة من العمود الأول
+        uniqueCol2 = data.uniqueCol2; // تخزين القيم الفريدة من العمود الثاني
 
-        // تأكد من وجود بيانات
-        if (data.length > 0) {
-          // استخدام الصف الأول من البيانات كعناوين
-          Object.keys(data[0]).forEach(header => {
-            const th = document.createElement('th');
-            th.innerText = header; // إضافة عنوان العمود
-            headerRow.appendChild(th);
-          });
+        // ملء القوائم المنسدلة
+        fillDropdown(uniqueCol1, 'filterCol1');
+        fillDropdown(uniqueCol2, 'filterCol2');
 
-          // إضافة الصفوف إلى الجدول
-          const body = output.getElementsByTagName('tbody')[0];
-
-          // إضافة كل الصفوف من البيانات
-          data.forEach((row) => {
-            const rowElement = document.createElement('tr');
-
-            Object.values(row).forEach(value => {
-              const cell = document.createElement('td');
-              cell.innerText = value; // إضافة قيمة الخلية
-              rowElement.appendChild(cell);
-            });
-
-            body.appendChild(rowElement);
-          });
-        } else {
-          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
-        }
+        // عرض البيانات الأولية
+        displayData(allData);
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
+    }
+
+    function fillDropdown(uniqueValues, dropdownId) {
+      const dropdown = document.getElementById(dropdownId);
+      uniqueValues.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.innerText = value;
+        dropdown.appendChild(option);
+      });
+    }
+
+    function displayData(data) {
+      const output = document.getElementById('data');
+      const headerRow = document.getElementById('headerRow');
+      const body = output.getElementsByTagName('tbody')[0];
+
+      // تأكد من وجود بيانات
+      if (data.length > 0) {
+        headerRow.innerHTML = ''; // مسح محتوى صف العناوين
+        Object.keys(data[0]).forEach(header => {
+          const th = document.createElement('th');
+          th.innerText = header;
+          headerRow.appendChild(th);
+        });
+
+        body.innerHTML = ''; // مسح محتوى الصفوف
+        data.forEach((row) => {
+          const rowElement = document.createElement('tr');
+          Object.values(row).forEach(value => {
+            const cell = document.createElement('td');
+            cell.innerText = value;
+            rowElement.appendChild(cell);
+          });
+          body.appendChild(rowElement);
+        });
+      } else {
+        document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
+      }
+    }
+
+    function filterData() {
+      const filterCol1Value = document.getElementById('filterCol1').value;
+      const filterCol2Value = document.getElementById('filterCol2').value;
+
+      // تصفية البيانات بناءً على القيم المحددة
+      const filteredData = allData.filter(row => {
+        const matchesCol1 = filterCol1Value ? row[Object.keys(row)[0]] === filterCol1Value : true;
+        const matchesCol2 = filterCol2Value ? row[Object.keys(row)[1]] === filterCol2Value : true;
+        return matchesCol1 && matchesCol2;
+      });
+
+      displayData(filteredData); // عرض البيانات المصفاة
     }
 
     // استدعاء الدالة عند تحميل الصفحة
