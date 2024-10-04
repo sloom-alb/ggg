@@ -1,25 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Sheets Data Fetch</title>
+  <title>جلب البيانات من جداول جوجل</title>
 </head>
 <body>
-  <h1>Data from Google Sheets</h1>
+  <h1>البيانات من جداول جوجل</h1>
   <div id="data"></div>
 
   <script>
-    fetch('https://script.google.com/macros/s/AKfycby9jbH5tk2ZMGIkA49pLxSDWgWcZEJ9e48IGfA1pNaQz9NCzFk21w8Y-RsOjq13uLQ/exec')
-      .then(response => response.json())
-      .then(data => {
+    async function fetchData() {
+      const url = 'https://script.google.com/macros/s/AKfycbyDjXpEtQQWg_VnrljRTUx0QH3XZCW8O0GWjTxzXqNXJN3-SRj6ZB3GKq9GiXRvuqsWxQ/exec'; // استبدل YOUR_WEB_APP_URL برابط Google Apps Script
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        console.log(data);
+
+        // عرض البيانات على الصفحة
         const output = document.getElementById('data');
         data.forEach(row => {
           const rowData = Object.values(row).join(' | ');
           output.innerHTML += `<p>${rowData}</p>`;
         });
-      })
-      .catch(error => console.error('Error:', error));
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    // استدعاء الدالة عند تحميل الصفحة
+    fetchData();
   </script>
 </body>
 </html>
