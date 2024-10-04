@@ -70,7 +70,7 @@
 
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
-        
+
         // تأكد من وجود بيانات
         if (data.length > 0) {
           // استخدم الصف الأول من البيانات كعناوين
@@ -84,25 +84,18 @@
         // إضافة الصفوف إلى الجدول
         const body = output.getElementsByTagName('tbody')[0];
 
-        // ابدأ من الصف الأول من البيانات (الصفر) ليكون عنوانًا
+        // ابدأ من الصف الثاني من البيانات (index 1) لأن الصف الأول سيكون العنوان
         data.forEach((row, index) => {
+          // تخطي الصف الأول من البيانات كمحتوى
+          if (index === 0) return; // تخطي الصف الأول
+
           const rowElement = document.createElement('tr');
 
-          // استخدم الصف الأول من البيانات (index === 0) كعنوان
-          if (index === 0) {
-            Object.values(row).forEach(value => {
-              const cell = document.createElement('td');
-              cell.innerText = value;
-              rowElement.appendChild(cell);
-            });
-            rowElement.classList.add('header'); // إضافة صف العنوان
-          } else {
-            Object.values(row).forEach(value => {
-              const cell = document.createElement('td');
-              cell.innerText = value;
-              rowElement.appendChild(cell);
-            });
-          }
+          Object.values(row).forEach(value => {
+            const cell = document.createElement('td');
+            cell.innerText = value;
+            rowElement.appendChild(cell);
+          });
 
           body.appendChild(rowElement);
         });
