@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
@@ -11,12 +11,10 @@
       padding: 20px;
       background-color: #f4f4f4;
     }
-
     h1 {
       text-align: center;
       color: #333;
     }
-
     table {
       width: 100%;
       max-width: 800px;
@@ -26,19 +24,16 @@
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
-
     th, td {
       padding: 12px;
       border: 1px solid #eaeaea;
-      text-align: center; /* توسيط النص */
+      text-align: center;
     }
-
     th {
       background-color: #f2f2f2;
       color: #555;
-      font-weight: bold; /* جعل النص في العنوان عريض */
+      font-weight: bold;
     }
-
     .error {
       color: red;
       text-align: center;
@@ -73,32 +68,29 @@
 
         // تأكد من وجود بيانات
         if (data.length > 0) {
-          // استخدم الصف الأول من البيانات كعناوين
+          // استخدام الصف الأول من البيانات كعناوين
           Object.keys(data[0]).forEach(header => {
             const th = document.createElement('th');
             th.innerText = header;
             headerRow.appendChild(th);
           });
-        }
 
-        // إضافة الصفوف إلى الجدول
-        const body = output.getElementsByTagName('tbody')[0];
+          // إضافة الصفوف إلى الجدول
+          const body = output.getElementsByTagName('tbody')[0];
 
-        // ابدأ من الصف الثاني من البيانات (index 1) لأن الصف الأول سيكون العنوان
-        data.forEach((row, index) => {
-          // تخطي الصف الأول من البيانات كمحتوى
-          if (index === 0) return; // تخطي الصف الأول
+          // إضافة كل الصفوف من البيانات
+          data.forEach((row) => {
+            const rowElement = document.createElement('tr');
 
-          const rowElement = document.createElement('tr');
+            Object.values(row).forEach(value => {
+              const cell = document.createElement('td');
+              cell.innerText = value;
+              rowElement.appendChild(cell);
+            });
 
-          Object.values(row).forEach(value => {
-            const cell = document.createElement('td');
-            cell.innerText = value;
-            rowElement.appendChild(cell);
+            body.appendChild(rowElement);
           });
-
-          body.appendChild(rowElement);
-        });
+        }
       } catch (error) {
         console.error('Error fetching data:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
