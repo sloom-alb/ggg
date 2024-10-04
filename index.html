@@ -1,71 +1,41 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جلب البيانات من جداول جوجل</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
     table {
       width: 100%;
-      max-width: 800px;
-      margin: 20px auto;
       border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
     }
     th, td {
-      padding: 12px;
-      border: 1px solid #eaeaea;
+      padding: 8px 12px;
       text-align: center;
+      border: 1px solid #ddd;
     }
     th {
-      background-color: #4CAF50;
-      color: white;
-      font-weight: bold;
-    }
-    .error {
-      color: red;
-      text-align: center;
-      margin-top: 20px;
+      background-color: #f2f2f2;
     }
   </style>
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
+  
+  <div id="filters">
+    <label for="filter1">تصفية العمود الأول:</label>
+    <select id="filter1"></select>
+    
+    <label for="filter2">تصفية العمود الثاني:</label>
+    <select id="filter2"></select>
+  </div>
 
-  <label for="filterCol1">اختر قيمة من العمود الأول:</label>
-  <select id="filterCol1" onchange="filterData()">
-    <option value="">جميع القيم</option>
-  </select>
-
-  <label for="filterCol2">اختر قيمة من العمود الثاني:</label>
-  <select id="filterCol2" onchange="filterData()">
-    <option value="">جميع القيم</option>
-  </select>
-
-  <table id="data">
-    <thead>
-      <tr id="headerRow"></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div id="error" class="error"></div>
+  <div id="data"></div>
+  <div id="error" style="color: red;"></div>
 
   <script>
-    let allData = []; // لتخزين جميع البيانات
-    let uniqueCol1 = []; // لتخزين القيم الفريدة للعمود الأول
-    let uniqueCol2 = []; // لتخزين القيم الفريدة للعمود الثاني
+    let allData = [];
 
     async function fetchData() {
       const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec';
@@ -73,78 +43,67 @@
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error('استجابة الشبكة لم تكن جيدة');
+          throw new Error('استجابة الشبكة لم تكن جيدة: ' + response.status);
         }
-        const data = await response.json();
-        console.log(data);
+        allData = await response.json();
+        console.log(allData);
 
-        allData = data.data; // تخزين البيانات
-        uniqueCol1 = data.uniqueCol1; // تخزين القيم الفريدة من العمود الأول
-        uniqueCol2 = data.uniqueCol2; // تخزين القيم الفريدة من العمود الثاني
-
-        // ملء القوائم المنسدلة
-        fillDropdown(uniqueCol1, 'filterCol1');
-        fillDropdown(uniqueCol2, 'filterCol2');
-
-        // عرض البيانات الأولية
-        displayData(allData);
+        renderTable(allData);
+        populateFilters(allData);
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
 
-    function fillDropdown(uniqueValues, dropdownId) {
-      const dropdown = document.getElementById(dropdownId);
-      uniqueValues.forEach(value => {
+    function renderTable(data) {
+      const output = document.getElementById('data');
+      const table = document.createElement('table');
+
+      // إضافة صف العناوين
+      const headerRow = document.createElement('tr');
+      Object.keys(data[0]).forEach(key => {
+        const th = document.createElement('th');
+        th.innerText = key; // استخدم تسميات الأعمدة في الصف الأول
+        headerRow.appendChild(th);
+      });
+      table.appendChild(headerRow);
+
+      // إضافة البيانات إلى الجدول
+      data.forEach(row => {
+        const rowElement = document.createElement('tr');
+        Object.values(row).forEach(value => {
+          const td = document.createElement('td');
+          td.innerText = value;
+          rowElement.appendChild(td);
+        });
+        table.appendChild(rowElement);
+      });
+
+      output.innerHTML = ''; // مسح أي محتوى سابق
+      output.appendChild(table); // إضافة الجدول إلى الصفحة
+    }
+
+    function populateFilters(data) {
+      const uniqueValuesCol1 = [...new Set(data.map(item => item['COLUMN1']))];
+      const uniqueValuesCol2 = [...new Set(data.map(item => item['COLUMN2']))];
+
+      const filter1 = document.getElementById('filter1');
+      const filter2 = document.getElementById('filter2');
+
+      uniqueValuesCol1.forEach(value => {
         const option = document.createElement('option');
         option.value = value;
         option.innerText = value;
-        dropdown.appendChild(option);
-      });
-    }
-
-    function displayData(data) {
-      const output = document.getElementById('data');
-      const headerRow = document.getElementById('headerRow');
-      const body = output.getElementsByTagName('tbody')[0];
-
-      // تأكد من وجود بيانات
-      if (data.length > 0) {
-        headerRow.innerHTML = ''; // مسح محتوى صف العناوين
-        Object.keys(data[0]).forEach(header => {
-          const th = document.createElement('th');
-          th.innerText = header;
-          headerRow.appendChild(th);
-        });
-
-        body.innerHTML = ''; // مسح محتوى الصفوف
-        data.forEach((row) => {
-          const rowElement = document.createElement('tr');
-          Object.values(row).forEach(value => {
-            const cell = document.createElement('td');
-            cell.innerText = value;
-            rowElement.appendChild(cell);
-          });
-          body.appendChild(rowElement);
-        });
-      } else {
-        document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
-      }
-    }
-
-    function filterData() {
-      const filterCol1Value = document.getElementById('filterCol1').value;
-      const filterCol2Value = document.getElementById('filterCol2').value;
-
-      // تصفية البيانات بناءً على القيم المحددة
-      const filteredData = allData.filter(row => {
-        const matchesCol1 = filterCol1Value ? row[Object.keys(row)[0]] === filterCol1Value : true;
-        const matchesCol2 = filterCol2Value ? row[Object.keys(row)[1]] === filterCol2Value : true;
-        return matchesCol1 && matchesCol2;
+        filter1.appendChild(option);
       });
 
-      displayData(filteredData); // عرض البيانات المصفاة
+      uniqueValuesCol2.forEach(value => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.innerText = value;
+        filter2.appendChild(option);
+      });
     }
 
     // استدعاء الدالة عند تحميل الصفحة
