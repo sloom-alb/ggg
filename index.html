@@ -30,12 +30,13 @@
     th, td {
       padding: 12px;
       border: 1px solid #eaeaea;
-      text-align: right; /* لجعل النص في العمود الأيمن */
+      text-align: center; /* توسيط النص */
     }
 
     th {
       background-color: #f2f2f2;
       color: #555;
+      font-weight: bold; /* جعل النص في العنوان عريض */
     }
 
     .error {
@@ -48,6 +49,9 @@
 <body>
   <h1>البيانات من جداول جوجل</h1>
   <table id="data">
+    <thead>
+      <tr id="headerRow"></tr> <!-- صف العنوان -->
+    </thead>
     <tbody></tbody>
   </table>
   <div id="error" class="error"></div>
@@ -64,10 +68,20 @@
         const data = await response.json();
         console.log(data);
 
-        // عرض البيانات على الصفحة
-        const output = document.getElementById('data').getElementsByTagName('tbody')[0];
+        const output = document.getElementById('data');
+        const headerRow = document.getElementById('headerRow');
         
+        // إضافة الصف الأول كعنوان
+        if (data.length > 0) {
+          Object.keys(data[0]).forEach(header => {
+            const th = document.createElement('th');
+            th.innerText = header;
+            headerRow.appendChild(th);
+          });
+        }
+
         // إضافة الصفوف إلى الجدول
+        const body = output.getElementsByTagName('tbody')[0];
         data.forEach(row => {
           const rowElement = document.createElement('tr');
 
@@ -77,7 +91,7 @@
             rowElement.appendChild(cell);
           });
 
-          output.appendChild(rowElement);
+          body.appendChild(rowElement);
         });
       } catch (error) {
         console.error('Error fetching data:', error);
