@@ -11,10 +11,12 @@
       padding: 20px;
       background-color: #f4f4f4;
     }
+
     h1 {
       text-align: center;
       color: #333;
     }
+
     table {
       width: 100%;
       max-width: 800px;
@@ -24,16 +26,19 @@
       border-radius: 8px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
+
     th, td {
       padding: 12px;
       border: 1px solid #eaeaea;
-      text-align: center;
+      text-align: center; /* توسيط النص */
     }
+
     th {
       background-color: #f2f2f2;
       color: #555;
-      font-weight: bold;
+      font-weight: bold; /* جعل النص في العنوان عريض */
     }
+
     .error {
       color: red;
       text-align: center;
@@ -65,10 +70,9 @@
 
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
-
-        // تأكد من وجود بيانات
+        
+        // إضافة الصف الأول كعنوان
         if (data.length > 0) {
-          // استخدم الصف الأول من البيانات كعناوين
           Object.keys(data[0]).forEach(header => {
             const th = document.createElement('th');
             th.innerText = header;
@@ -78,12 +82,7 @@
 
         // إضافة الصفوف إلى الجدول
         const body = output.getElementsByTagName('tbody')[0];
-
-        // ابدأ من الصف الثاني من البيانات (index 1) لأن الصف الأول سيكون العنوان
-        data.forEach((row, index) => {
-          // تخطي الصف الأول من البيانات كمحتوى
-          if (index === 0) return; // تخطي الصف الأول
-
+        data.forEach(row => {
           const rowElement = document.createElement('tr');
 
           Object.values(row).forEach(value => {
