@@ -30,8 +30,8 @@
       text-align: center;
     }
     th {
-      background-color: #4CAF50; /* لون خلفية العنوان */
-      color: white; /* لون نص العنوان */
+      background-color: #f2f2f2;
+      color: #555;
       font-weight: bold;
     }
     .error {
@@ -53,15 +53,15 @@
 
   <script>
     async function fetchData() {
-      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل هذا بالرابط الخاص بك
+      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec';
 
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error('استجابة الشبكة لم تكن جيدة');
+          throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(data); // تحقق من البيانات في وحدة التحكم
+        console.log(data);
 
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
@@ -71,7 +71,7 @@
           // استخدام الصف الأول من البيانات كعناوين
           Object.keys(data[0]).forEach(header => {
             const th = document.createElement('th');
-            th.innerText = header; // إضافة عنوان العمود
+            th.innerText = header;
             headerRow.appendChild(th);
           });
 
@@ -84,17 +84,15 @@
 
             Object.values(row).forEach(value => {
               const cell = document.createElement('td');
-              cell.innerText = value; // إضافة قيمة الخلية
+              cell.innerText = value;
               rowElement.appendChild(cell);
             });
 
             body.appendChild(rowElement);
           });
-        } else {
-          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
         }
       } catch (error) {
-        console.error('حدث خطأ في جلب البيانات:', error);
+        console.error('Error fetching data:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
