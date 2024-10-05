@@ -28,7 +28,6 @@
       padding: 12px;
       border: 1px solid #eaeaea;
       text-align: center;
-      word-wrap: break-word;
     }
     th {
       background-color: #4CAF50;
@@ -55,48 +54,54 @@
   <script>
     async function fetchData() {
       const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل هذا بالرابط الخاص بك
-      const startTime = performance.now(); // لقياس الوقت
+      const cacheKey = 'cachedData';
 
       try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('استجابة الشبكة لم تكن جيدة');
-        }
-        const data = await response.json();
+        let cachedData = localStorage.getItem(cacheKey);
         
-        const endTime = performance.now(); // انتهاء الوقت
-        console.log('Time taken to fetch:', (endTime - startTime) + 'ms');
-
-        const output = document.getElementById('data');
-        const headerRow = document.getElementById('headerRow');
-
-        // تأكد من وجود بيانات
-        if (data.length > 0) {
-          // إضافة العنوان بناءً على أول صف من البيانات
-          const firstRow = data[0];
-          Object.keys(firstRow).forEach(header => {
-            const th = document.createElement('th');
-            th.innerText = header;
-            headerRow.appendChild(th);
-          });
-
-          // إضافة باقي البيانات إلى الجدول
-          const body = output.getElementsByTagName('tbody')[0];
-          data.slice(1).forEach(row => { // تخطي الصف الأول لأنه العنوان
-            const rowElement = document.createElement('tr');
-            Object.values(row).forEach(value => {
-              const cell = document.createElement('td');
-              cell.innerText = value;
-              rowElement.appendChild(cell);
-            });
-            body.appendChild(rowElement);
-          });
+        if (cachedData) {
+          console.log('Using cached data');
+          displayData(JSON.parse(cachedData));
         } else {
-          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error('استجابة الشبكة لم تكن جيدة');
+          }
+          const data = await response.json();
+          localStorage.setItem(cacheKey, JSON.stringify(data)); // تخزين البيانات في localStorage
+          displayData(data);
         }
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
+      }
+    }
+
+    function displayData(data) {
+      const output = document.getElementById('data');
+      const headerRow = document.getElementById('headerRow');
+      
+      // تأكد من وجود بيانات
+      if (data.length > 0) {
+        const firstRow = data[0];
+        Object.keys(firstRow).forEach(header => {
+          const th = document.createElement('th');
+          th.innerText = header;
+          headerRow.appendChild(th);
+        });
+
+        const body = output.getElementsByTagName('tbody')[0];
+        data.slice(1).forEach(row => {
+          const rowElement = document.createElement('tr');
+          Object.values(row).forEach(value => {
+            const cell = document.createElement('td');
+            cell.innerText = value;
+            rowElement.appendChild(cell);
+          });
+          body.appendChild(rowElement);
+        });
+      } else {
+        document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
       }
     }
 
