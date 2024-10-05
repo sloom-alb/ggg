@@ -39,11 +39,21 @@
       text-align: center;
       margin-top: 20px;
     }
+    .loading {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 18px;
+      color: #4CAF50;
+    }
   </style>
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
-  <table id="data">
+
+  <!-- مؤشر تحميل -->
+  <div id="loading" class="loading">جاري تحميل البيانات...</div>
+
+  <table id="data" style="display:none;">
     <thead>
       <tr id="headerRow"></tr> <!-- صف العنوان -->
     </thead>
@@ -65,6 +75,12 @@
 
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+
+        // إخفاء مؤشر التحميل
+        loadingElement.style.display = 'none';
+        output.style.display = 'table';
 
         // تأكد من وجود بيانات
         if (data.length > 0) {
@@ -91,10 +107,11 @@
             body.appendChild(rowElement);
           });
         } else {
-          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
+          errorElement.innerText = 'لا توجد بيانات لعرضها.';
         }
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
+        document.getElementById('loading').style.display = 'none';
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
