@@ -22,21 +22,10 @@
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
-  
-  <div id="filters">
-    <label for="filter1">تصفية العمود الأول:</label>
-    <select id="filter1"></select>
-    
-    <label for="filter2">تصفية العمود الثاني:</label>
-    <select id="filter2"></select>
-  </div>
-
   <div id="data"></div>
   <div id="error" style="color: red;"></div>
 
   <script>
-    let allData = [];
-
     async function fetchData() {
       const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec';
 
@@ -45,65 +34,39 @@
         if (!response.ok) {
           throw new Error('استجابة الشبكة لم تكن جيدة: ' + response.status);
         }
-        allData = await response.json();
-        console.log(allData);
+        const data = await response.json();
+        console.log(data);
 
-        renderTable(allData);
-        populateFilters(allData);
+        const output = document.getElementById('data');
+        const table = document.createElement('table');
+
+        // إضافة صف العناوين
+        const headerRow = document.createElement('tr');
+        Object.keys(data[0]).forEach(key => {
+          const th = document.createElement('th');
+          th.innerText = key; // استخدم تسميات الأعمدة في الصف الأول
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // إضافة البيانات إلى الجدول
+        data.forEach(row => {
+          const rowElement = document.createElement('tr');
+          Object.values(row).forEach(value => {
+            const td = document.createElement('td');
+            td.innerText = value;
+            rowElement.appendChild(td);
+          });
+          table.appendChild(rowElement);
+        });
+
+        output.innerHTML = ''; // مسح أي محتوى سابق
+        output.appendChild(table); // إضافة الجدول إلى الصفحة
+
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
-    }
-
-    function renderTable(data) {
-      const output = document.getElementById('data');
-      const table = document.createElement('table');
-
-      // إضافة صف العناوين
-      const headerRow = document.createElement('tr');
-      Object.keys(data[0]).forEach(key => {
-        const th = document.createElement('th');
-        th.innerText = key; // استخدم تسميات الأعمدة في الصف الأول
-        headerRow.appendChild(th);
-      });
-      table.appendChild(headerRow);
-
-      // إضافة البيانات إلى الجدول
-      data.forEach(row => {
-        const rowElement = document.createElement('tr');
-        Object.values(row).forEach(value => {
-          const td = document.createElement('td');
-          td.innerText = value;
-          rowElement.appendChild(td);
-        });
-        table.appendChild(rowElement);
-      });
-
-      output.innerHTML = ''; // مسح أي محتوى سابق
-      output.appendChild(table); // إضافة الجدول إلى الصفحة
-    }
-
-    function populateFilters(data) {
-      const uniqueValuesCol1 = [...new Set(data.map(item => item['COLUMN1']))];
-      const uniqueValuesCol2 = [...new Set(data.map(item => item['COLUMN2']))];
-
-      const filter1 = document.getElementById('filter1');
-      const filter2 = document.getElementById('filter2');
-
-      uniqueValuesCol1.forEach(value => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.innerText = value;
-        filter1.appendChild(option);
-      });
-
-      uniqueValuesCol2.forEach(value => {
-        const option = document.createElement('option');
-        option.value = value;
-        option.innerText = value;
-        filter2.appendChild(option);
-      });
     }
 
     // استدعاء الدالة عند تحميل الصفحة
