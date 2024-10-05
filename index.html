@@ -1,101 +1,31 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جلب البيانات من جداول جوجل</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
-    table {
-      width: 100%;
-      max-width: 800px;
-      margin: 20px auto;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    th, td {
-      padding: 12px;
-      border: 1px solid #eaeaea;
-      text-align: center; /* توسيط النص */
-    }
-
-    th {
-      background-color: #f2f2f2;
-      color: #555;
-      font-weight: bold; /* جعل النص في العنوان عريض */
-    }
-
-    .error {
-      color: red;
-      text-align: center;
-      margin-top: 20px;
-    }
-  </style>
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
-  <table id="data">
-    <thead>
-      <tr id="headerRow"></tr> <!-- صف العنوان -->
-    </thead>
-    <tbody></tbody>
-  </table>
-  <div id="error" class="error"></div>
+  <div id="data"></div>
 
   <script>
     async function fetchData() {
-      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec';
+      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل YOUR_WEB_APP_URL برابط Google Apps Script
 
       try {
         const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
         const data = await response.json();
         console.log(data);
 
+        // عرض البيانات على الصفحة
         const output = document.getElementById('data');
-        const headerRow = document.getElementById('headerRow');
-        
-        // إضافة الصف الأول كعنوان
-        if (data.length > 0) {
-          Object.keys(data[0]).forEach(header => {
-            const th = document.createElement('th');
-            th.innerText = header;
-            headerRow.appendChild(th);
-          });
-        }
-
-        // إضافة الصفوف إلى الجدول
-        const body = output.getElementsByTagName('tbody')[0];
         data.forEach(row => {
-          const rowElement = document.createElement('tr');
-
-          Object.values(row).forEach(value => {
-            const cell = document.createElement('td');
-            cell.innerText = value;
-            rowElement.appendChild(cell);
-          });
-
-          body.appendChild(rowElement);
+          const rowData = Object.values(row).join(' | ');
+          output.innerHTML += <p>${rowData}</p>;
         });
       } catch (error) {
         console.error('Error fetching data:', error);
-        document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
 
