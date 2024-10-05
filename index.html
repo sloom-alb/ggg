@@ -4,28 +4,98 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جلب البيانات من جداول جوجل</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #eaeaea;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50; /* لون خلفية العنوان */
+      color: white; /* لون نص العنوان */
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
-  <div id="data"></div>
+  <table id="data">
+    <thead>
+      <tr id="headerRow"></tr> <!-- صف العنوان -->
+    </thead>
+    <tbody></tbody>
+  </table>
+  <div id="error" class="error"></div>
 
   <script>
     async function fetchData() {
-      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل YOUR_WEB_APP_URL برابط Google Apps Script
+      const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل هذا بالرابط الخاص بك
 
       try {
         const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('استجابة الشبكة لم تكن جيدة');
+        }
         const data = await response.json();
-        console.log(data);
+        console.log(data); // تحقق من البيانات في وحدة التحكم
 
-        // عرض البيانات على الصفحة
         const output = document.getElementById('data');
-        data.forEach(row => {
-          const rowData = Object.values(row).join(' | ');
-          output.innerHTML += <p>${rowData}</p>;
-        });
+        const headerRow = document.getElementById('headerRow');
+
+        // تأكد من وجود بيانات
+        if (data.length > 0) {
+          // استخدام الصف الأول من البيانات كعناوين
+          Object.keys(data[0]).forEach(header => {
+            const th = document.createElement('th');
+            th.innerText = header; // إضافة عنوان العمود
+            headerRow.appendChild(th);
+          });
+
+          // إضافة الصفوف إلى الجدول
+          const body = output.getElementsByTagName('tbody')[0];
+
+          // إضافة كل الصفوف من البيانات
+          data.forEach((row) => {
+            const rowElement = document.createElement('tr');
+
+            Object.values(row).forEach(value => {
+              const cell = document.createElement('td');
+              cell.innerText = value; // إضافة قيمة الخلية
+              rowElement.appendChild(cell);
+            });
+
+            body.appendChild(rowElement);
+          });
+        } else {
+          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
+        }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('حدث خطأ في جلب البيانات:', error);
+        document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
 
