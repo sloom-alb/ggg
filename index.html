@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
@@ -28,10 +28,11 @@
       padding: 12px;
       border: 1px solid #eaeaea;
       text-align: center;
+      word-wrap: break-word;
     }
     th {
-      background-color: #4CAF50; /* لون خلفية العنوان */
-      color: white; /* لون نص العنوان */
+      background-color: #4CAF50;
+      color: white;
       font-weight: bold;
     }
     .error {
@@ -39,23 +40,13 @@
       text-align: center;
       margin-top: 20px;
     }
-    .loading {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 18px;
-      color: #4CAF50;
-    }
   </style>
 </head>
 <body>
   <h1>البيانات من جداول جوجل</h1>
-
-  <!-- مؤشر تحميل -->
-  <div id="loading" class="loading">جاري تحميل البيانات...</div>
-
-  <table id="data" style="display:none;">
+  <table id="data">
     <thead>
-      <tr id="headerRow"></tr> <!-- صف العنوان -->
+      <tr id="headerRow"></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -64,6 +55,7 @@
   <script>
     async function fetchData() {
       const url = 'https://script.google.com/macros/s/AKfycbxoilCX7h6IIM_WbAS-yG_gRoksP69_ztS6tNXbmedU7tMtwId3lhRkn436N-wYIKb2yA/exec'; // استبدل هذا بالرابط الخاص بك
+      const startTime = performance.now(); // لقياس الوقت
 
       try {
         const response = await fetch(url);
@@ -71,47 +63,39 @@
           throw new Error('استجابة الشبكة لم تكن جيدة');
         }
         const data = await response.json();
-        console.log(data); // تحقق من البيانات في وحدة التحكم
+        
+        const endTime = performance.now(); // انتهاء الوقت
+        console.log('Time taken to fetch:', (endTime - startTime) + 'ms');
 
         const output = document.getElementById('data');
         const headerRow = document.getElementById('headerRow');
-        const loadingElement = document.getElementById('loading');
-        const errorElement = document.getElementById('error');
-
-        // إخفاء مؤشر التحميل
-        loadingElement.style.display = 'none';
-        output.style.display = 'table';
 
         // تأكد من وجود بيانات
         if (data.length > 0) {
-          // استخدام الصف الأول من البيانات كعناوين
-          Object.keys(data[0]).forEach(header => {
+          // إضافة العنوان بناءً على أول صف من البيانات
+          const firstRow = data[0];
+          Object.keys(firstRow).forEach(header => {
             const th = document.createElement('th');
-            th.innerText = header; // إضافة عنوان العمود
+            th.innerText = header;
             headerRow.appendChild(th);
           });
 
-          // إضافة الصفوف إلى الجدول
+          // إضافة باقي البيانات إلى الجدول
           const body = output.getElementsByTagName('tbody')[0];
-
-          // إضافة كل الصفوف من البيانات
-          data.forEach((row) => {
+          data.slice(1).forEach(row => { // تخطي الصف الأول لأنه العنوان
             const rowElement = document.createElement('tr');
-
             Object.values(row).forEach(value => {
               const cell = document.createElement('td');
-              cell.innerText = value; // إضافة قيمة الخلية
+              cell.innerText = value;
               rowElement.appendChild(cell);
             });
-
             body.appendChild(rowElement);
           });
         } else {
-          errorElement.innerText = 'لا توجد بيانات لعرضها.';
+          document.getElementById('error').innerText = 'لا توجد بيانات لعرضها.';
         }
       } catch (error) {
         console.error('حدث خطأ في جلب البيانات:', error);
-        document.getElementById('loading').style.display = 'none';
         document.getElementById('error').innerText = 'حدث خطأ في جلب البيانات، يرجى المحاولة مرة أخرى.';
       }
     }
